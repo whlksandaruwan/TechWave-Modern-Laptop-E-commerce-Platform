@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link, useSearchParams, useNavigate } from 'react-router-dom';
+import { Link, useSearchParams, useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Heart, ShoppingCart } from 'lucide-react';
 import { mockProducts } from '../../data/mockData';
@@ -19,6 +19,7 @@ const ProductGrid = ({ filters, searchQuery }: ProductGridProps) => {
   const [products, setProducts] = useState<Product[]>([]);
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const { addItem } = useCartStore();
   const { addItem: addToWishlist, isInWishlist, removeItem: removeFromWishlist } = useWishlistStore();
   const { isAuthenticated } = useAuthStore();
