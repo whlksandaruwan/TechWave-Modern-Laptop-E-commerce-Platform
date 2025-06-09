@@ -44,6 +44,8 @@ api.interceptors.response.use(
 // Laptops
 export const getLaptops = () => api.get<Laptop[]>('/laptops');
 export const getLaptopById = (id: string) => api.get<Laptop>(`/laptops/${id}`);
+export const createLaptop = (data: Partial<Laptop>) =>
+  api.post<Laptop>('/laptops', data);
 export const getFeaturedLaptops = () => api.get<Laptop[]>('/laptops/featured');
 
 // Categories

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
   Plus, 
@@ -125,12 +126,13 @@ const Products = () => {
     >
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold">Products</h1>
-        <button
+        <Link
+          to="/admin/products/new"
           className="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
         >
           <Plus className="w-5 h-5 mr-2" />
           Add Product
-        </button>
+        </Link>
       </div>
 
       <div className="bg-white rounded-xl shadow-sm overflow-hidden mb-8">
