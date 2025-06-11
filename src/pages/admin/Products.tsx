@@ -12,13 +12,13 @@ import {
   Download, 
   Upload 
 } from 'lucide-react';
-import { mockProducts } from '../../data/mockData';
 import { formatPrice } from '../../lib/utils';
-import { Product } from '../../types';
 import { toast } from 'sonner';
+import { getLaptops, deleteLaptop } from '../../lib/api';
+import { Laptop } from '../../types/api';
 
 const Products = () => {
-  const [products, setProducts] = useState<Product[]>([]);
+  const [products, setProducts] = useState<Laptop[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
@@ -32,21 +32,28 @@ const Products = () => {
     document.title = 'Manage Products - TechWave Admin';
     
     // Fetch products
-    setIsLoading(true);
-    setTimeout(() => {
-      setProducts(mockProducts);
-      setIsLoading(false);
-    }, 500);
+    fetchProducts();
   }, []);
+
+  const fetchProducts = async () => {
+    try {
+      setIsLoading(true);
+      const data = await getLaptops();
+      setProducts(data);
+    } catch (error) {
+      toast.error('Failed to fetch products');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     // Filter products by search query
-    const filtered = mockProducts.filter(
+    const filtered = products.filter(
       product => 
         product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.brand.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.category.toLowerCase().includes(searchQuery.toLowerCase())
+        product.description.toLowerCase().includes(searchQuery.toLowerCase())
     );
     setProducts(filtered);
     setCurrentPage(1);
@@ -103,17 +110,27 @@ const Products = () => {
     }
   };
 
-  const handleDeleteSelected = () => {
+  const handleDeleteSelected = async () => {
     if (selectedProducts.length === 0) return;
     
-    // In a real app, this would call your API to delete products
-    const remainingProducts = products.filter(
-      product => !selectedProducts.includes(product.id)
-    );
-    
-    setProducts(remainingProducts);
-    setSelectedProducts([]);
-    toast.success(`${selectedProducts.length} products deleted successfully`);
+    try {
+      await Promise.all(selectedProducts.map(id => deleteLaptop(id)));
+      await fetchProducts(); // Refresh the product list
+      setSelectedProducts([]);
+      toast.success(`${selectedProducts.length} products deleted successfully`);
+    } catch (error) {
+      toast.error('Failed to delete products');
+    }
+  };
+
+  const handleDeleteSingle = async (id: string) => {
+    try {
+      await deleteLaptop(id);
+      await fetchProducts(); // Refresh the product list
+      toast.success('Product deleted successfully');
+    } catch (error) {
+      toast.error('Failed to delete product');
+    }
   };
 
   return (
@@ -151,7 +168,7 @@ const Products = () => {
               </div>
             </form>
             
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center gap-2">
               <button
                 className="inline-flex items-center px-3 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
               >
@@ -281,7 +298,7 @@ const Products = () => {
                             </div>
                             <div className="ml-4">
                               <div className="text-sm font-medium text-gray-900">{product.name}</div>
-                              <div className="text-sm text-gray-500">{product.brand}</div>
+                              <div className="text-sm text-gray-500">{product.description.substring(0, 50)}...</div>
                             </div>
                           </div>
                         </td>
@@ -289,15 +306,10 @@ const Products = () => {
                           <div className="text-sm text-gray-900 font-medium">
                             {formatPrice(product.price)}
                           </div>
-                          {product.discountPercentage && (
-                            <div className="text-xs text-gray-500 line-through">
-                              {formatPrice(product.price * (1 + product.discountPercentage / 100))}
-                            </div>
-                          )}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                            {product.category}
+                            {product.categoryId}
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
@@ -312,10 +324,16 @@ const Products = () => {
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                          <button className="text-primary-600 hover:text-primary-800 mr-3">
+                          <Link 
+                            to={`/admin/products/${product.id}/edit`}
+                            className="text-primary-600 hover:text-primary-900 mr-3"
+                          >
                             <Edit className="w-4 h-4" />
-                          </button>
-                          <button className="text-red-600 hover:text-red-800">
+                          </Link>
+                          <button 
+                            onClick={() => handleDeleteSingle(product.id)}
+                            className="text-red-600 hover:text-red-900"
+                          >
                             <Trash2 className="w-4 h-4" />
                           </button>
                         </td>

@@ -3,27 +3,22 @@ import { Product } from './index';
 export interface Laptop {
   id: string;
   name: string;
-  brand: string;
   description: string;
   price: number;
-  discountPercentage?: number;
-  stock: number;
-  rating: number;
-  category: string;
-  featured: boolean;
-  images: string[];
-  slug: string;
-  specifications: {
+  specs: {
     processor: string;
-    memory: string;
+    ram: string;
     storage: string;
     display: string;
     graphics: string;
-    operatingSystem: string;
     battery: string;
-    weight: string;
-    ports: string[];
   };
+  images: string[];
+  stock: number;
+  categoryId: string;
+  featured: boolean;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface Category {

@@ -15,7 +15,9 @@ import { Module } from '@nestjs/common';
       password: 'root',
       database: 'laptop',
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
-      synchronize: true, // Set to false in production
+      synchronize: true,
+      logging: true,
+      autoLoadEntities: true,
     }),
     LaptopsModule,
     AuthModule,

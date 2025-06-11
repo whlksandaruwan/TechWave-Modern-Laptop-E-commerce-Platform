@@ -1,7 +1,6 @@
-
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Laptop } from './laptop.entity';
+import { Laptop } from './entities/laptop.entity';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
@@ -15,7 +14,7 @@ export class LaptopsService {
     return this.laptopsRepository.find();
   }
 
-  findOne(id: number): Promise<Laptop> {
+  findOne(id: string): Promise<Laptop> {
     return this.laptopsRepository.findOne({ where: { id } });
   }
 
@@ -24,12 +23,12 @@ export class LaptopsService {
     return this.laptopsRepository.save(newLaptop);
   }
 
-  async update(id: number, laptop: Partial<Laptop>): Promise<Laptop> {
+  async update(id: string, laptop: Partial<Laptop>): Promise<Laptop> {
     await this.laptopsRepository.update(id, laptop);
     return this.findOne(id);
   }
 
-  async remove(id: number): Promise<void> {
+  async remove(id: string): Promise<void> {
     await this.laptopsRepository.delete(id);
   }
 } 

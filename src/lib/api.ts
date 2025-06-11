@@ -42,11 +42,31 @@ api.interceptors.response.use(
 );
 
 // Laptops
-export const getLaptops = () => api.get<Laptop[]>('/laptops');
-export const getLaptopById = (id: string) => api.get<Laptop>(`/laptops/${id}`);
-export const createLaptop = (data: Partial<Laptop>) =>
-  api.post<Laptop>('/laptops', data);
+export const getLaptops = async (): Promise<Laptop[]> => {
+  const response = await api.get<Laptop[]>('/laptops');
+  return response.data;
+};
+
+export const getLaptop = async (id: string): Promise<Laptop> => {
+  const response = await api.get<Laptop>(`/laptops/${id}`);
+  return response.data;
+};
+
+export const createLaptop = async (laptop: Omit<Laptop, 'id' | 'createdAt' | 'updatedAt'>): Promise<Laptop> => {
+  const response = await api.post<Laptop>('/laptops', laptop);
+  return response.data;
+};
+
 export const getFeaturedLaptops = () => api.get<Laptop[]>('/laptops/featured');
+
+export const updateLaptop = async (id: string, laptop: Partial<Laptop>): Promise<Laptop> => {
+  const response = await api.patch<Laptop>(`/laptops/${id}`, laptop);
+  return response.data;
+};
+
+export const deleteLaptop = async (id: string): Promise<void> => {
+  await api.delete(`/laptops/${id}`);
+};
 
 // Categories
 export const getCategories = () => api.get<Category[]>('/categories');

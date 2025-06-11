@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
-import { createLaptop } from '../../lib/api';
+import { getLaptop, updateLaptop } from '../../lib/api';
 
-const AddProduct = () => {
+const EditProduct = () => {
   const navigate = useNavigate();
+  const { id } = useParams<{ id: string }>();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -26,8 +28,32 @@ const AddProduct = () => {
   });
 
   useEffect(() => {
-    document.title = 'Add Product - TechWave Admin';
-  }, []);
+    document.title = 'Edit Product - TechWave Admin';
+    fetchProduct();
+  }, [id]);
+
+  const fetchProduct = async () => {
+    if (!id) return;
+    try {
+      setIsLoading(true);
+      const product = await getLaptop(id);
+      setFormData({
+        name: product.name,
+        description: product.description,
+        price: product.price.toString(),
+        specs: product.specs,
+        images: product.images.length > 0 ? product.images : [''],
+        stock: product.stock.toString(),
+        categoryId: product.categoryId,
+        featured: product.featured
+      });
+    } catch (error) {
+      toast.error('Failed to fetch product');
+      navigate('/admin/products');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target;
@@ -72,22 +98,32 @@ const AddProduct = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!id) return;
+    
     setIsSubmitting(true);
     try {
-      await createLaptop({
+      await updateLaptop(id, {
         ...formData,
         price: Number(formData.price),
         stock: Number(formData.stock),
         images: formData.images.filter(img => img.trim() !== '')
       });
-      toast.success('Product added successfully');
+      toast.success('Product updated successfully');
       navigate('/admin/products');
     } catch (error) {
-      toast.error('Failed to add product');
+      toast.error('Failed to update product');
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+      </div>
+    );
+  }
 
   return (
     <motion.div
@@ -97,7 +133,7 @@ const AddProduct = () => {
       transition={{ duration: 0.3 }}
       className="max-w-2xl mx-auto p-6"
     >
-      <h1 className="text-2xl font-bold mb-6">Add New Product</h1>
+      <h1 className="text-2xl font-bold mb-6">Edit Product</h1>
       <form className="space-y-6" onSubmit={handleSubmit}>
         <div>
           <label className="block text-sm font-medium mb-1" htmlFor="name">
@@ -325,7 +361,7 @@ const AddProduct = () => {
             disabled={isSubmitting}
             className="flex-1 py-2 px-4 bg-primary-600 text-white rounded-md hover:bg-primary-700 disabled:opacity-50"
           >
-            {isSubmitting ? 'Saving...' : 'Save Product'}
+            {isSubmitting ? 'Saving...' : 'Save Changes'}
           </button>
         </div>
       </form>
@@ -333,4 +369,4 @@ const AddProduct = () => {
   );
 };
 
-export default AddProduct;
+export default EditProduct; 
