@@ -1,7 +1,27 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { CartItem, Product } from '../types';
-import { mockProducts } from '../data/mockData';
+import { CartItem } from '../types';
+
+interface Laptop {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  specs: {
+    processor: string;
+    ram: string;
+    storage: string;
+    display: string;
+    graphics: string;
+    battery: string;
+  };
+  images: string[];
+  stock: number;
+  categoryId: string;
+  featured: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
 
 interface CartState {
   items: CartItem[];
@@ -9,7 +29,7 @@ interface CartState {
   removeItem: (productId: string) => void;
   updateQuantity: (productId: string, quantity: number) => void;
   clearCart: () => void;
-  getCartTotal: () => number;
+  getCartTotal: () => Promise<number>;
   getCartItemsCount: () => number;
 }
 
@@ -58,18 +78,23 @@ export const useCartStore = create<CartState>()(
         set({ items: [] });
       },
       
-      getCartTotal: () => {
+      getCartTotal: async () => {
         const { items } = get();
-        return items.reduce((total, item) => {
-          const product = mockProducts.find(p => p.id === item.productId);
-          if (!product) return total;
-          
-          const price = product.discountPercentage 
-            ? product.price * (1 - product.discountPercentage / 100) 
-            : product.price;
-            
-          return total + (price * item.quantity);
-        }, 0);
+        let total = 0;
+        for (const item of items) {
+          try {
+            const response = await fetch(`http://localhost:3000/api/laptops/${item.productId}`);
+            if (!response.ok) {
+              console.error(`Failed to fetch product ${item.productId}:`, response.statusText);
+              continue;
+            }
+            const product: Laptop = await response.json();
+            total += product.price * item.quantity;
+          } catch (error) {
+            console.error(`Error fetching product ${item.productId}:`, error);
+          }
+        }
+        return total;
       },
       
       getCartItemsCount: () => {

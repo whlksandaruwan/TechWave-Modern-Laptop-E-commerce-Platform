@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { LaptopsModule } from './laptops/laptops.module';
 import { AuthModule } from './auth/auth.module';
 import { Module } from '@nestjs/common';
+import { CategoriesModule } from './categories/categories.module';
 
 @Module({
   imports: [
@@ -17,10 +18,10 @@ import { Module } from '@nestjs/common';
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
       synchronize: true,
       logging: true,
-      autoLoadEntities: true,
     }),
     LaptopsModule,
     AuthModule,
+    CategoriesModule,
   ],
 })
 export class AppModule {} 

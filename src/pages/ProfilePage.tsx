@@ -16,14 +16,31 @@ import {
   CheckCircle 
 } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
-import { mockOrders } from '../data/mockData';
 import { formatPrice } from '../lib/utils';
+
+interface OrderItem {
+  productId: string;
+  quantity: number;
+  name: string; // Assuming name is returned with order item
+  image: string; // Assuming image is returned with order item
+  price: number; // Assuming price is returned with order item
+}
+
+interface Order {
+  id: string;
+  createdAt: string;
+  totalAmount: number;
+  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+  items: OrderItem[];
+}
 
 const ProfilePage = () => {
   const [searchParams] = useSearchParams();
-  const { user, logout } = useAuthStore();
+  const { user, logout, isAuthenticated, token } = useAuthStore();
   const [activeTab, setActiveTab] = useState<'orders' | 'addresses' | 'payment' | 'wishlist' | 'settings'>('orders');
-  const [orders, setOrders] = useState(mockOrders);
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [isLoadingOrders, setIsLoadingOrders] = useState(true);
+  const [ordersError, setOrdersError] = useState<string | null>(null);
   const [showOrderSuccess, setShowOrderSuccess] = useState(false);
   
   useEffect(() => {
@@ -42,7 +59,68 @@ const ProfilePage = () => {
       
       return () => clearTimeout(timer);
     }
-  }, [searchParams]);
+
+    const fetchOrders = async () => {
+      if (!isAuthenticated || !token) {
+        setIsLoadingOrders(false);
+        return;
+      }
+
+      try {
+        setIsLoadingOrders(true);
+        setOrdersError(null);
+        const response = await fetch('http://localhost:3000/api/orders', { // Assuming /api/orders endpoint
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch orders: ${response.statusText}`);
+        }
+        const data: Order[] = await response.json();
+
+        // For each order, fetch product details for items if needed (mock data had product details)
+        const ordersWithProductDetails = await Promise.all(data.map(async (order) => {
+          const itemsWithDetails = await Promise.all(order.items.map(async (item) => {
+            // If the backend directly provides name, image, price for order items, use that.
+            // Otherwise, fetch from /api/laptops/productId
+            if (item.name && item.image && item.price) {
+              return item;
+            } else {
+              try {
+                const productResponse = await fetch(`http://localhost:3000/api/laptops/${item.productId}`);
+                if (!productResponse.ok) {
+                  console.error(`Failed to fetch product for order item ${item.productId}:`, productResponse.statusText);
+                  return { ...item, name: 'Unknown Product', image: '/placeholder.jpg', price: 0 }; // Fallback
+                }
+                const productData = await productResponse.json();
+                return {
+                  ...item,
+                  name: productData.name,
+                  image: productData.images[0] || '/placeholder.jpg',
+                  price: productData.price,
+                };
+              } catch (productError) {
+                console.error(`Error fetching product for order item ${item.productId}:`, productError);
+                return { ...item, name: 'Unknown Product', image: '/placeholder.jpg', price: 0 }; // Fallback
+              }
+            }
+          }));
+          return { ...order, items: itemsWithDetails };
+        }));
+
+        setOrders(ordersWithProductDetails);
+      } catch (err) {
+        console.error("Error fetching orders:", err);
+        setOrdersError('Failed to load orders. Please try again later.');
+      } finally {
+        setIsLoadingOrders(false);
+      }
+    };
+
+    fetchOrders();
+  }, [searchParams, isAuthenticated, token]);
 
   const handleLogout = () => {
     logout();
@@ -101,7 +179,7 @@ const ProfilePage = () => {
               )}
             </div>
             <div>
-              <h1 className="text-2xl font-bold mb-1">Welcome, {user?.name}</h1>
+              <h1 className="text-2xl font-bold mb-1">Welcome, {user?.firstName} {user?.lastName}</h1>
               <p className="text-gray-600">{user?.email}</p>
             </div>
           </div>
@@ -184,9 +262,19 @@ const ProfilePage = () => {
                   <h2 className="font-medium">My Orders</h2>
                 </div>
                 
-                <div className="divide-y">
-                  {orders.length > 0 ? (
-                    orders.map((order) => (
+                {isLoadingOrders ? (
+                  <div className="text-center py-12">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+                  </div>
+                ) : ordersError ? (
+                  <div className="text-center py-12 text-red-500">Error: {ordersError}</div>
+                ) : orders.length === 0 ? (
+                  <div className="text-center py-12 text-gray-600">
+                    You haven't placed any orders yet.
+                  </div>
+                ) : (
+                  <div className="divide-y">
+                    {orders.map((order) => (
                       <div key={order.id} className="p-6">
                         <div className="flex flex-wrap justify-between items-start mb-4">
                           <div>
@@ -248,270 +336,117 @@ const ProfilePage = () => {
                               Write a Review
                             </button>
                           )}
-                          
-                          <button className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
-                            Track Shipment
-                          </button>
                         </div>
                       </div>
-                    ))
-                  ) : (
-                    <div className="text-center py-16">
-                      <div className="inline-flex items-center justify-center w-16 h-16 bg-gray-100 rounded-full mb-6">
-                        <ShoppingBag className="w-8 h-8 text-gray-500" />
-                      </div>
-                      <h3 className="text-lg font-medium mb-2">No orders yet</h3>
-                      <p className="text-gray-600 mb-6">
-                        When you place an order, it will appear here.
-                      </p>
-                      <Link 
-                        to="/products" 
-                        className="inline-flex items-center justify-center px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg transition-colors"
-                      >
-                        Start Shopping
-                      </Link>
-                    </div>
-                  )}
-                </div>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
             
             {/* Addresses Tab */}
             {activeTab === 'addresses' && (
-              <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-                <div className="px-6 py-4 border-b">
-                  <h2 className="font-medium">My Addresses</h2>
+              <div className="bg-white rounded-xl shadow-sm p-6">
+                <h2 className="font-medium mb-4">My Addresses</h2>
+                <div className="text-gray-600">
+                  No addresses added yet.
                 </div>
-                
-                <div className="p-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                    <div className="border rounded-lg p-4 relative">
-                      <div className="absolute top-4 right-4">
-                        <button className="text-primary-600 hover:text-primary-800 text-sm font-medium">
-                          Edit
-                        </button>
-                      </div>
-                      <div className="font-medium mb-1">John Doe</div>
-                      <div className="text-gray-600 text-sm">
-                        <div>123 Main St</div>
-                        <div>San Francisco, CA 94105</div>
-                        <div>United States</div>
-                        <div className="mt-2">555-123-4567</div>
-                      </div>
-                      <div className="mt-3 flex items-center">
-                        <span className="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded">
-                          Default Address
-                        </span>
-                      </div>
-                    </div>
-                    
-                    <div className="border rounded-lg p-4 border-dashed flex flex-col items-center justify-center text-center">
-                      <MapPin className="w-8 h-8 text-gray-400 mb-2" />
-                      <h3 className="font-medium mb-1">Add a new address</h3>
-                      <p className="text-sm text-gray-500 mb-4">
-                        Save your shipping addresses for faster checkout
-                      </p>
-                      <button className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
-                        Add Address
-                      </button>
-                    </div>
-                  </div>
-                </div>
+                {/* Add address form/list here */}
               </div>
             )}
             
             {/* Payment Methods Tab */}
             {activeTab === 'payment' && (
-              <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-                <div className="px-6 py-4 border-b">
-                  <h2 className="font-medium">Payment Methods</h2>
+              <div className="bg-white rounded-xl shadow-sm p-6">
+                <h2 className="font-medium mb-4">Payment Methods</h2>
+                <div className="text-gray-600">
+                  No payment methods added yet.
                 </div>
-                
-                <div className="p-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                    <div className="border rounded-lg p-4 relative">
-                      <div className="absolute top-4 right-4">
-                        <button className="text-primary-600 hover:text-primary-800 text-sm font-medium">
-                          Edit
-                        </button>
-                      </div>
-                      <div className="flex items-center mb-3">
-                        <div className="w-10 h-6 bg-gray-200 rounded mr-3"></div>
-                        <div className="font-medium">Visa ending in 4242</div>
-                      </div>
-                      <div className="text-gray-600 text-sm">
-                        <div>John Doe</div>
-                        <div>Expires 12/25</div>
-                      </div>
-                      <div className="mt-3 flex items-center">
-                        <span className="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded">
-                          Default Payment
-                        </span>
-                      </div>
-                    </div>
-                    
-                    <div className="border rounded-lg p-4 border-dashed flex flex-col items-center justify-center text-center">
-                      <CreditCard className="w-8 h-8 text-gray-400 mb-2" />
-                      <h3 className="font-medium mb-1">Add a new payment method</h3>
-                      <p className="text-sm text-gray-500 mb-4">
-                        Save your payment details for faster checkout
-                      </p>
-                      <button className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
-                        Add Payment Method
-                      </button>
-                    </div>
-                  </div>
-                </div>
+                {/* Add payment method form/list here */}
               </div>
             )}
             
             {/* Wishlist Tab */}
             {activeTab === 'wishlist' && (
-              <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-                <div className="px-6 py-4 border-b">
-                  <h2 className="font-medium">My Wishlist</h2>
-                </div>
-                
-                <div className="p-6">
-                  <div className="text-center py-16">
-                    <div className="inline-flex items-center justify-center w-16 h-16 bg-gray-100 rounded-full mb-6">
-                      <Heart className="w-8 h-8 text-gray-500" />
-                    </div>
-                    <h3 className="text-lg font-medium mb-2">Your wishlist is empty</h3>
-                    <p className="text-gray-600 mb-6">
-                      Save items you're interested in for later.
-                    </p>
-                    <Link 
-                      to="/products" 
-                      className="inline-flex items-center justify-center px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg transition-colors"
-                    >
-                      Discover Products
-                    </Link>
-                  </div>
-                </div>
+              <div className="bg-white rounded-xl shadow-sm p-6">
+                <h2 className="font-medium mb-4">My Wishlist</h2>
+                <p className="text-gray-600">This section will display your wishlist items.</p>
+                {/* Wishlist content will be rendered by the WishlistPage component directly */}
+                <Link to="/wishlist" className="text-primary-600 hover:underline mt-4 inline-block">
+                  Go to Wishlist
+                </Link>
               </div>
             )}
             
             {/* Account Settings Tab */}
             {activeTab === 'settings' && (
-              <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-                <div className="px-6 py-4 border-b">
-                  <h2 className="font-medium">Account Settings</h2>
-                </div>
+              <div className="bg-white rounded-xl shadow-sm p-6">
+                <h2 className="font-medium mb-4">Account Settings</h2>
                 
-                <div className="p-6">
-                  <div className="mb-8">
-                    <h3 className="text-lg font-medium mb-4">Profile Information</h3>
-                    <form onSubmit={handleUpdateProfile}>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                        <div>
-                          <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
-                            Full Name
-                          </label>
-                          <input
-                            type="text"
-                            id="name"
-                            defaultValue={user?.name}
-                            className="w-full rounded-md border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50"
-                          />
-                        </div>
-                        
-                        <div>
-                          <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                            Email Address
-                          </label>
-                          <input
-                            type="email"
-                            id="email"
-                            defaultValue={user?.email}
-                            className="w-full rounded-md border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50"
-                          />
-                        </div>
-                        
-                        <div>
-                          <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
-                            Phone Number
-                          </label>
-                          <input
-                            type="tel"
-                            id="phone"
-                            className="w-full rounded-md border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50"
-                          />
-                        </div>
-                      </div>
-                      
-                      <div>
-                        <button
-                          type="submit"
-                          className="px-4 py-2 bg-primary-600 text-white rounded-md text-sm font-medium hover:bg-primary-700 transition-colors"
-                        >
-                          Update Profile
-                        </button>
-                      </div>
-                    </form>
-                  </div>
-                  
-                  <div className="border-t pt-8">
-                    <h3 className="text-lg font-medium mb-4">Change Password</h3>
-                    <form onSubmit={handleUpdatePassword}>
-                      <div className="space-y-4 mb-6">
-                        <div>
-                          <label htmlFor="currentPassword" className="block text-sm font-medium text-gray-700 mb-1">
-                            Current Password
-                          </label>
-                          <input
-                            type="password"
-                            id="currentPassword"
-                            className="w-full rounded-md border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50"
-                          />
-                        </div>
-                        
-                        <div>
-                          <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700 mb-1">
-                            New Password
-                          </label>
-                          <input
-                            type="password"
-                            id="newPassword"
-                            className="w-full rounded-md border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50"
-                          />
-                        </div>
-                        
-                        <div>
-                          <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
-                            Confirm New Password
-                          </label>
-                          <input
-                            type="password"
-                            id="confirmPassword"
-                            className="w-full rounded-md border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50"
-                          />
-                        </div>
-                      </div>
-                      
-                      <div>
-                        <button
-                          type="submit"
-                          className="px-4 py-2 bg-primary-600 text-white rounded-md text-sm font-medium hover:bg-primary-700 transition-colors"
-                        >
-                          Change Password
-                        </button>
-                      </div>
-                    </form>
-                  </div>
-                  
-                  <div className="border-t pt-8 mt-8">
-                    <h3 className="text-lg font-medium mb-4">Delete Account</h3>
-                    <p className="text-gray-600 mb-4">
-                      Once you delete your account, all of your data will be permanently removed.
-                      This action cannot be undone.
-                    </p>
+                <div className="mb-6">
+                  <h3 className="text-lg font-medium mb-3">Personal Information</h3>
+                  <form onSubmit={handleUpdateProfile} className="space-y-4">
+                    <div>
+                      <label htmlFor="name" className="block text-sm font-medium text-gray-700">Name</label>
+                      <input
+                        type="text"
+                        id="name"
+                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+                        defaultValue={`${user?.firstName || ''} ${user?.lastName || ''}`}
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
+                      <input
+                        type="email"
+                        id="email"
+                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+                        defaultValue={user?.email || ''}
+                      />
+                    </div>
                     <button
-                      className="px-4 py-2 bg-red-600 text-white rounded-md text-sm font-medium hover:bg-red-700 transition-colors"
+                      type="submit"
+                      className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
                     >
-                      Delete Account
+                      Save Changes
                     </button>
-                  </div>
+                  </form>
+                </div>
+
+                <div>
+                  <h3 className="text-lg font-medium mb-3">Password</h3>
+                  <form onSubmit={handleUpdatePassword} className="space-y-4">
+                    <div>
+                      <label htmlFor="current-password" className="block text-sm font-medium text-gray-700">Current Password</label>
+                      <input
+                        type="password"
+                        id="current-password"
+                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="new-password" className="block text-sm font-medium text-gray-700">New Password</label>
+                      <input
+                        type="password"
+                        id="new-password"
+                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="confirm-password" className="block text-sm font-medium text-gray-700">Confirm New Password</label>
+                      <input
+                        type="password"
+                        id="confirm-password"
+                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+                      />
+                    </div>
+                    <button
+                      type="submit"
+                      className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+                    >
+                      Change Password
+                    </button>
+                  </form>
                 </div>
               </div>
             )}

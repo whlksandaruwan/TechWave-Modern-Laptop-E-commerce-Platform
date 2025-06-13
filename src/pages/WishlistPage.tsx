@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Heart, ShoppingCart, Trash2, LogIn } from 'lucide-react';
-import { mockProducts } from '../data/mockData';
 import { formatPrice } from '../lib/utils';
 import { useWishlistStore } from '../store/wishlistStore';
 import { useCartStore } from '../store/cartStore';
@@ -10,26 +9,62 @@ import { useAuthStore } from '../store/authStore';
 import { Product } from '../types';
 import { toast } from 'sonner';
 
+interface Laptop {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  specs: {
+    processor: string;
+    ram: string;
+    storage: string;
+    display: string;
+    graphics: string;
+    battery: string;
+  };
+  images: string[];
+  stock: number;
+  categoryId: string;
+  featured: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 const WishlistPage = () => {
   const { items, removeItem, clearWishlist } = useWishlistStore();
   const { addItem: addToCart } = useCartStore();
   const { isAuthenticated } = useAuthStore();
-  const [wishlistProducts, setWishlistProducts] = useState<Product[]>([]);
+  const [wishlistProducts, setWishlistProducts] = useState<Laptop[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     // Update page title
     document.title = 'Your Wishlist - TechWave';
     
-    // Fetch wishlist products
-    setIsLoading(true);
-    
-    const products = items
-      .map(productId => mockProducts.find(p => p.id === productId))
-      .filter((product): product is Product => product !== undefined);
-    
-    setWishlistProducts(products);
-    setIsLoading(false);
+    const fetchWishlistProducts = async () => {
+      setIsLoading(true);
+      setError(null);
+      const fetchedProducts: Laptop[] = [];
+      
+      for (const productId of items) {
+        try {
+          const response = await fetch(`http://localhost:3000/api/laptops/${productId}`);
+          if (!response.ok) {
+            throw new Error(`Failed to fetch product ${productId}: ${response.statusText}`);
+          }
+          const product: Laptop = await response.json();
+          fetchedProducts.push(product);
+        } catch (err) {
+          console.error(`Error fetching product ${productId}:`, err);
+          setError('Failed to load some wishlist items.');
+        }
+      }
+      setWishlistProducts(fetchedProducts);
+      setIsLoading(false);
+    };
+
+    fetchWishlistProducts();
   }, [items]);
 
   const handleRemoveItem = (productId: string) => {
@@ -41,7 +76,7 @@ const WishlistPage = () => {
     toast.success('Item removed from wishlist');
   };
 
-  const handleAddToCart = (product: Product) => {
+  const handleAddToCart = (product: Laptop) => {
     addToCart(product.id, 1);
     toast.success(`${product.name} added to cart`);
   };
@@ -103,6 +138,8 @@ const WishlistPage = () => {
           <div className="flex justify-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
           </div>
+        ) : error ? (
+          <div className="text-center py-16 text-red-500">Error: {error}</div>
         ) : wishlistProducts.length === 0 ? (
           <div className="text-center py-16 max-w-md mx-auto">
             <div className="inline-flex items-center justify-center w-16 h-16 bg-gray-100 rounded-full mb-6">
@@ -135,9 +172,7 @@ const WishlistPage = () => {
               
               <div>
                 {wishlistProducts.map((product) => {
-                  const price = product.discountPercentage 
-                    ? product.price * (1 - product.discountPercentage / 100) 
-                    : product.price;
+                  const price = product.price; // No discountPercentage from backend for now
                     
                   return (
                     <div 
@@ -156,23 +191,24 @@ const WishlistPage = () => {
                         <div className="flex flex-col sm:flex-row sm:items-start justify-between">
                           <div>
                             <Link 
-                              to={`/products/${product.slug}`}
+                              to={`/products/${product.id}`}
                               className="text-lg font-medium hover:text-primary-600 transition-colors"
                             >
                               {product.name}
                             </Link>
-                            <p className="text-gray-500 text-sm">{product.brand}</p>
+                            <p className="text-gray-500 text-sm">Category ID: {product.categoryId}</p> {/* Displaying category ID for now */}
                           </div>
                           
                           <div className="mt-2 sm:mt-0 text-right">
                             <div className="font-bold">
                               {formatPrice(price)}
                             </div>
-                            {product.discountPercentage && (
+                            {/* Discounted price not available from backend for now */}
+                            {/* {product.discountPercentage && (
                               <div className="text-sm text-gray-500 line-through">
                                 {formatPrice(product.price)}
                               </div>
-                            )}
+                            )} */}
                           </div>
                         </div>
                         

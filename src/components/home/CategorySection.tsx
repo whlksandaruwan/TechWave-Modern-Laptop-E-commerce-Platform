@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { mockCategories } from '../../data/mockData';
 
 const CategorySection = () => {
   const categories = [
@@ -99,7 +98,7 @@ const CategorySection = () => {
           ))}
         </motion.div>
 
-        <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-4">
+        {/* <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-4">
           {mockCategories.map((category) => (
             <Link
               key={category.id}
@@ -110,7 +109,7 @@ const CategorySection = () => {
               <p className="text-sm text-gray-500">{category.count} products</p>
             </Link>
           ))}
-        </div>
+        </div> */}
       </div>
     </section>
   );

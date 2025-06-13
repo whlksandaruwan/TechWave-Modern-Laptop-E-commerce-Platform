@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowRight, Heart, ShoppingCart } from 'lucide-react';
-import { mockProducts } from '../../data/mockData';
 import { formatPrice } from '../../lib/utils';
 import { useCartStore } from '../../store/cartStore';
 import { useWishlistStore } from '../../store/wishlistStore';
@@ -10,25 +9,65 @@ import { useAuthStore } from '../../store/authStore';
 import { Product } from '../../types';
 import { toast } from 'sonner';
 
+interface Laptop {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  specs: {
+    processor: string;
+    ram: string;
+    storage: string;
+    display: string;
+    graphics: string;
+    battery: string;
+  };
+  images: string[];
+  stock: number;
+  categoryId: string;
+  featured: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 const FeaturedProducts = () => {
-  const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
+  const [featuredProducts, setFeaturedProducts] = useState<Laptop[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const { addItem } = useCartStore();
   const { addItem: addToWishlist, isInWishlist, removeItem: removeFromWishlist } = useWishlistStore();
   const { isAuthenticated } = useAuthStore();
 
   useEffect(() => {
-    // Get featured products from mock data
-    const featured = mockProducts.filter(product => product.featured);
-    setFeaturedProducts(featured);
+    const fetchFeaturedProducts = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const response = await fetch('http://localhost:3000/api/laptops'); // Fetch all laptops
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data: Laptop[] = await response.json();
+        const featured = data.filter(product => product.featured); // Filter for featured products
+        setFeaturedProducts(featured);
+      } catch (err) {
+        console.error("Failed to fetch featured products:", err);
+        setError('Failed to load featured products. Please try again later.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchFeaturedProducts();
   }, []);
 
-  const handleAddToCart = (e: React.MouseEvent, product: Product) => {
+  const handleAddToCart = (e: React.MouseEvent, product: Laptop) => {
     e.preventDefault();
     addItem(product.id, 1);
     toast.success(`${product.name} added to cart!`);
   };
 
-  const handleToggleWishlist = async (e: React.MouseEvent, product: Product) => {
+  const handleToggleWishlist = async (e: React.MouseEvent, product: Laptop) => {
     e.preventDefault();
     
     if (!isAuthenticated) {
@@ -48,6 +87,39 @@ const FeaturedProducts = () => {
       // Error is already handled by the store and shown via toast
     }
   };
+
+  if (isLoading) {
+    return (
+      <section className="py-20 bg-gray-50">
+        <div className="container mx-auto px-4 text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading featured products...</p>
+        </div>
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <section className="py-20 bg-gray-50">
+        <div className="container mx-auto px-4 text-center text-red-500">
+          <h2 className="text-xl font-medium mb-2">Error loading featured products</h2>
+          <p>{error}</p>
+        </div>
+      </section>
+    );
+  }
+
+  if (featuredProducts.length === 0) {
+    return (
+      <section className="py-20 bg-gray-50">
+        <div className="container mx-auto px-4 text-center">
+          <h2 className="text-xl font-medium mb-2">No featured products found</h2>
+          <p className="text-gray-600">Check back later for exciting new arrivals!</p>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="py-20 bg-gray-50">
@@ -77,7 +149,7 @@ const FeaturedProducts = () => {
               transition={{ duration: 0.4, delay: index * 0.1 }}
             >
               <Link 
-                to={`/products/${product.slug}`}
+                to={`/products/${product.id}`}
                 className="group block bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow relative"
               >
                 {/* Product image */}
@@ -107,40 +179,30 @@ const FeaturedProducts = () => {
                   </button>
                 </div>
                 
-                {/* Discount badge */}
-                {product.discountPercentage && (
+                {/* Discount badge - not available from backend for now */}
+                {/* {product.discountPercentage && (
                   <div className="absolute top-4 left-4 bg-accent-500 text-white text-xs font-bold px-2 py-1 rounded">
                     {product.discountPercentage}% OFF
                   </div>
-                )}
+                )} */}
                 
                 {/* Product info */}
                 <div className="p-6">
-                  <div className="text-sm text-gray-500 mb-2">{product.brand}</div>
+                  <div className="text-sm text-gray-500 mb-2">Category ID: {product.categoryId}</div>
                   <h3 className="font-semibold text-lg mb-2 group-hover:text-primary-600 transition-colors">
                     {product.name}
                   </h3>
                   <p className="text-gray-600 text-sm mb-4 line-clamp-2">
-                    {product.shortDescription}
+                    {product.description}
                   </p>
                   <div className="flex items-end justify-between">
                     <div>
-                      {product.discountPercentage ? (
-                        <div className="flex items-center gap-2">
-                          <span className="font-bold text-lg">
-                            {formatPrice(product.price * (1 - product.discountPercentage / 100))}
-                          </span>
-                          <span className="text-gray-500 text-sm line-through">
-                            {formatPrice(product.price)}
-                          </span>
-                        </div>
-                      ) : (
-                        <span className="font-bold text-lg">
-                          {formatPrice(product.price)}
-                        </span>
-                      )}
+                      <span className="font-bold text-lg">
+                        {formatPrice(product.price)}
+                      </span>
                     </div>
-                    <div className="flex items-center">
+                    {/* No rating or numReviews from backend for now */}
+                    {/* <div className="flex items-center">
                       <div className="flex items-center">
                         {Array.from({ length: 5 }).map((_, i) => (
                           <svg 
@@ -154,7 +216,7 @@ const FeaturedProducts = () => {
                         ))}
                       </div>
                       <span className="text-xs text-gray-500 ml-1">({product.numReviews})</span>
-                    </div>
+                    </div> */}
                   </div>
                 </div>
               </Link>

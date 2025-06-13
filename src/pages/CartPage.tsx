@@ -2,42 +2,90 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Trash2, ShoppingCart, RefreshCw, CheckCircle, ArrowRight } from 'lucide-react';
-import { mockProducts } from '../data/mockData';
 import { formatPrice } from '../lib/utils';
 import { useCartStore } from '../store/cartStore';
 import { Product } from '../types';
 import { toast } from 'sonner';
 
+interface Laptop {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  specs: {
+    processor: string;
+    ram: string;
+    storage: string;
+    display: string;
+    graphics: string;
+    battery: string;
+  };
+  images: string[];
+  stock: number;
+  categoryId: string;
+  featured: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 const CartPage = () => {
   const navigate = useNavigate();
   const { items, removeItem, updateQuantity, clearCart, getCartTotal } = useCartStore();
-  const [cartProducts, setCartProducts] = useState<(Product & { quantity: number })[]>([]);
+  const [cartProducts, setCartProducts] = useState<(Laptop & { quantity: number })[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [subtotal, setSubtotal] = useState(0);
+  const [shipping, setShipping] = useState(0);
+  const [total, setTotal] = useState(0);
   
-  const subtotal = getCartTotal();
-  const shipping = subtotal > 999 ? 0 : 30;
-  const total = subtotal + shipping;
+  useEffect(() => {
+    const calculateTotals = async () => {
+      const cartTotal = await getCartTotal();
+      const shippingCost = cartTotal > 999 ? 0 : 30;
+      setSubtotal(cartTotal);
+      setShipping(shippingCost);
+      setTotal(cartTotal + shippingCost);
+    };
+    
+    calculateTotals();
+  }, [getCartTotal, items]);
 
   useEffect(() => {
     // Update page title
     document.title = 'Your Cart - TechWave';
     
     // Fetch cart products
-    setIsLoading(true);
-    
-    const products = items.map(item => {
-      const product = mockProducts.find(p => p.id === item.productId);
-      if (!product) {
-        return null;
+    const fetchCartProducts = async () => {
+      setIsLoading(true);
+      try {
+        const products = await Promise.all(
+          items.map(async (item) => {
+            try {
+              const response = await fetch(`http://localhost:3000/api/laptops/${item.productId}`);
+              if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+              }
+              const product: Laptop = await response.json();
+              return {
+                ...product,
+                quantity: item.quantity
+              };
+            } catch (error) {
+              console.error(`Failed to fetch product ${item.productId}:`, error);
+              return null;
+            }
+          })
+        );
+        
+        setCartProducts(products.filter(Boolean) as (Laptop & { quantity: number })[]);
+      } catch (error) {
+        console.error('Failed to fetch cart products:', error);
+        toast.error('Failed to load cart items. Please try again.');
+      } finally {
+        setIsLoading(false);
       }
-      return {
-        ...product,
-        quantity: item.quantity
-      };
-    }).filter(Boolean) as (Product & { quantity: number })[];
-    
-    setCartProducts(products);
-    setIsLoading(false);
+    };
+
+    fetchCartProducts();
   }, [items]);
 
   const handleRemoveItem = (productId: string) => {
@@ -117,97 +165,86 @@ const CartPage = () => {
                 </div>
                 
                 <div>
-                  {cartProducts.map((product) => {
-                    const price = product.discountPercentage 
-                      ? product.price * (1 - product.discountPercentage / 100) 
-                      : product.price;
+                  {cartProducts.map((product) => (
+                    <div 
+                      key={product.id} 
+                      className="flex flex-col sm:flex-row items-start p-6 border-b last:border-b-0"
+                    >
+                      <div className="sm:w-24 sm:h-24 flex-shrink-0 bg-gray-100 rounded-lg overflow-hidden mb-4 sm:mb-0">
+                        <img 
+                          src={product.images[0]} 
+                          alt={product.name}
+                          className="w-full h-full object-cover object-center"
+                        />
+                      </div>
                       
-                    return (
-                      <div 
-                        key={product.id} 
-                        className="flex flex-col sm:flex-row items-start p-6 border-b last:border-b-0"
-                      >
-                        <div className="sm:w-24 sm:h-24 flex-shrink-0 bg-gray-100 rounded-lg overflow-hidden mb-4 sm:mb-0">
-                          <img 
-                            src={product.images[0]} 
-                            alt={product.name}
-                            className="w-full h-full object-cover object-center"
-                          />
-                        </div>
-                        
-                        <div className="sm:ml-6 flex-1">
-                          <div className="flex flex-col sm:flex-row sm:items-start justify-between">
-                            <div>
-                              <Link 
-                                to={`/products/${product.slug}`}
-                                className="text-lg font-medium hover:text-primary-600 transition-colors"
-                              >
-                                {product.name}
-                              </Link>
-                              <p className="text-gray-500 text-sm">{product.brand}</p>
-                            </div>
-                            
-                            <div className="mt-2 sm:mt-0 text-right">
-                              <div className="font-bold">
-                                {formatPrice(price * product.quantity)}
-                              </div>
-                              {product.discountPercentage && (
-                                <div className="text-sm text-gray-500 line-through">
-                                  {formatPrice(product.price * product.quantity)}
-                                </div>
-                              )}
-                            </div>
+                      <div className="sm:ml-6 flex-1">
+                        <div className="flex flex-col sm:flex-row sm:items-start justify-between">
+                          <div>
+                            <Link 
+                              to={`/products/${product.id}`}
+                              className="text-lg font-medium hover:text-primary-600 transition-colors"
+                            >
+                              {product.name}
+                            </Link>
+                            <p className="text-gray-500 text-sm">Category: {product.categoryId}</p>
                           </div>
                           
-                          <div className="flex flex-col sm:flex-row sm:items-center justify-between mt-4">
-                            <div className="flex items-center">
-                              <div className="mr-4">
-                                <label htmlFor={`quantity-${product.id}`} className="sr-only">
-                                  Quantity
-                                </label>
-                                <div className="flex">
-                                  <button
-                                    onClick={() => handleUpdateQuantity(product.id, Math.max(1, product.quantity - 1))}
-                                    className="px-2 py-1 border border-gray-300 bg-gray-50 text-gray-600 rounded-l-md hover:bg-gray-100"
-                                  >
-                                    -
-                                  </button>
-                                  <input
-                                    type="number"
-                                    id={`quantity-${product.id}`}
-                                    min="1"
-                                    max={product.stock}
-                                    value={product.quantity}
-                                    onChange={(e) => handleUpdateQuantity(product.id, Math.max(1, Math.min(product.stock, parseInt(e.target.value) || 1)))}
-                                    className="w-12 text-center border-y border-gray-300 py-1 focus:ring-0 focus:outline-none"
-                                  />
-                                  <button
-                                    onClick={() => handleUpdateQuantity(product.id, Math.min(product.stock, product.quantity + 1))}
-                                    className="px-2 py-1 border border-gray-300 bg-gray-50 text-gray-600 rounded-r-md hover:bg-gray-100"
-                                  >
-                                    +
-                                  </button>
-                                </div>
+                          <div className="mt-2 sm:mt-0 text-right">
+                            <div className="font-bold">
+                              {formatPrice(product.price * product.quantity)}
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between mt-4">
+                          <div className="flex items-center">
+                            <div className="mr-4">
+                              <label htmlFor={`quantity-${product.id}`} className="sr-only">
+                                Quantity
+                              </label>
+                              <div className="flex">
+                                <button
+                                  onClick={() => handleUpdateQuantity(product.id, Math.max(1, product.quantity - 1))}
+                                  className="px-2 py-1 border border-gray-300 bg-gray-50 text-gray-600 rounded-l-md hover:bg-gray-100"
+                                >
+                                  -
+                                </button>
+                                <input
+                                  type="number"
+                                  id={`quantity-${product.id}`}
+                                  min="1"
+                                  max={product.stock}
+                                  value={product.quantity}
+                                  onChange={(e) => handleUpdateQuantity(product.id, Math.max(1, Math.min(product.stock, parseInt(e.target.value) || 1)))}
+                                  className="w-12 text-center border-y border-gray-300 py-1 focus:ring-0 focus:outline-none"
+                                />
+                                <button
+                                  onClick={() => handleUpdateQuantity(product.id, Math.min(product.stock, product.quantity + 1))}
+                                  className="px-2 py-1 border border-gray-300 bg-gray-50 text-gray-600 rounded-r-md hover:bg-gray-100"
+                                >
+                                  +
+                                </button>
                               </div>
-                              
-                              <button
-                                onClick={() => handleRemoveItem(product.id)}
-                                className="text-sm text-red-600 hover:text-red-800 font-medium flex items-center"
-                              >
-                                <Trash2 className="w-4 h-4 mr-1" />
-                                Remove
-                              </button>
                             </div>
                             
-                            <div className="mt-4 sm:mt-0 flex items-center text-sm text-gray-600">
-                              <CheckCircle className={`w-4 h-4 mr-1 ${product.stock > 0 ? 'text-green-500' : 'text-red-500'}`} />
-                              {product.stock > 0 ? 'In Stock' : 'Out of Stock'}
-                            </div>
+                            <button
+                              onClick={() => handleRemoveItem(product.id)}
+                              className="text-sm text-red-600 hover:text-red-800 font-medium flex items-center"
+                            >
+                              <Trash2 className="w-4 h-4 mr-1" />
+                              Remove
+                            </button>
+                          </div>
+                          
+                          <div className="mt-4 sm:mt-0 flex items-center text-sm text-gray-600">
+                            <CheckCircle className={`w-4 h-4 mr-1 ${product.stock > 0 ? 'text-green-500' : 'text-red-500'}`} />
+                            {product.stock > 0 ? 'In Stock' : 'Out of Stock'}
                           </div>
                         </div>
                       </div>
-                    );
-                  })}
+                    </div>
+                  ))}
                 </div>
               </div>
               
@@ -248,32 +285,19 @@ const CartPage = () => {
                     </div>
                   )}
                   
-                  <div className="border-t pt-4 flex justify-between font-bold">
-                    <span>Total</span>
-                    <span>{formatPrice(total)}</span>
+                  <div className="border-t pt-4">
+                    <div className="flex justify-between font-bold text-lg">
+                      <span>Total</span>
+                      <span>{formatPrice(total)}</span>
+                    </div>
                   </div>
                   
                   <button
                     onClick={handleCheckout}
-                    className="w-full mt-4 flex items-center justify-center px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg transition-colors"
+                    className="w-full bg-primary-600 hover:bg-primary-700 text-white font-medium py-3 px-4 rounded-lg transition-colors"
                   >
                     Proceed to Checkout
-                    <ArrowRight className="ml-2 w-5 h-5" />
                   </button>
-                  
-                  <div className="text-center text-sm text-gray-500 mt-4">
-                    All prices are calculated in USD
-                  </div>
-                </div>
-                
-                <div className="px-6 py-4 bg-gray-50 border-t">
-                  <h3 className="font-medium mb-2">We Accept</h3>
-                  <div className="flex space-x-2">
-                    <div className="w-10 h-6 bg-gray-200 rounded"></div>
-                    <div className="w-10 h-6 bg-gray-200 rounded"></div>
-                    <div className="w-10 h-6 bg-gray-200 rounded"></div>
-                    <div className="w-10 h-6 bg-gray-200 rounded"></div>
-                  </div>
                 </div>
               </div>
             </div>
