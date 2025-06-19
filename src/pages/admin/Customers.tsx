@@ -12,8 +12,10 @@ import {
   ChevronRight 
 } from 'lucide-react';
 import { formatPrice } from '../../lib/utils';
+import axios from 'axios';
 
 const Customers = () => {
+  const [allCustomers, setAllCustomers] = useState<any[]>([]);
   const [customers, setCustomers] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoading, setIsLoading] = useState(true);
@@ -24,38 +26,49 @@ const Customers = () => {
     // Update page title
     document.title = 'Manage Customers - TechWave Admin';
     
-    // Fetch customers
+    // Fetch real users from backend
     setIsLoading(true);
-    setTimeout(() => {
-      // Mock customer data
-      const mockCustomers = Array.from({ length: 50 }, (_, i) => ({
-        id: i + 1,
-        name: `Customer ${i + 1}`,
-        email: `customer${i + 1}@example.com`,
-        phone: `+1-555-${String(Math.floor(1000 + Math.random() * 9000))}`,
-        location: ['New York', 'Los Angeles', 'Chicago', 'Houston', 'Phoenix'][Math.floor(Math.random() * 5)],
-        totalSpent: Math.floor(500 + Math.random() * 5000),
-        orders: Math.floor(1 + Math.random() * 20),
-        lastOrder: new Date(Date.now() - Math.random() * 7776000000).toLocaleDateString() // Random date in the last 90 days
-      }));
-      
-      setCustomers(mockCustomers);
-      setIsLoading(false);
-    }, 500);
+    axios.get('http://localhost:3000/api/auth/users')
+      .then(res => {
+        console.log('API users:', res.data);
+        const users = (res.data as any[]).map((user: any) => ({
+          id: user.id,
+          name: user.firstName + ' ' + user.lastName,
+          email: user.email,
+          phone: '',
+          location: '',
+          totalSpent: 0,
+          orders: 0,
+          lastOrder: user.updatedAt ? new Date(user.updatedAt).toLocaleDateString() : '',
+          role: user.role,
+        }));
+        setAllCustomers(users);
+        setCustomers(users);
+        setIsLoading(false);
+      })
+      .catch(() => {
+        setAllCustomers([]);
+        setCustomers([]);
+        setIsLoading(false);
+      });
   }, []);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    // Filter customers by search query
     setIsLoading(true);
     setTimeout(() => {
-      const filtered = customers.filter(
-        customer => 
-          customer.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          customer.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          customer.phone.includes(searchQuery)
-      );
-      setCustomers(filtered);
+      if (searchQuery.trim() === '') {
+        setCustomers(allCustomers);
+      } else {
+        const filtered = allCustomers.filter(
+          customer => 
+            customer.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            customer.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            customer.phone.includes(searchQuery)
+        );
+        setCustomers(filtered);
+      }
+      setCurrentPage(1);
       setIsLoading(false);
     }, 500);
   };
@@ -98,7 +111,12 @@ const Customers = () => {
                   placeholder="Search customers..."
                   className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    if (e.target.value.trim() === '') {
+                      setCustomers(allCustomers);
+                    }
+                  }}
                 />
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
               </div>
@@ -141,9 +159,6 @@ const Customers = () => {
                       Contact
                     </th>
                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                      Location
-                    </th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                       Orders
                     </th>
                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
@@ -151,6 +166,9 @@ const Customers = () => {
                     </th>
                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                       Last Order
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                      Role
                     </th>
                     <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">
                       Actions
@@ -186,12 +204,6 @@ const Customers = () => {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center text-sm text-gray-500">
-                            <MapPin className="w-4 h-4 mr-1 text-gray-400" />
-                            {customer.location}
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex items-center text-sm text-gray-500">
                             <ShoppingBag className="w-4 h-4 mr-1 text-gray-400" />
                             {customer.orders}
                           </div>
@@ -201,6 +213,9 @@ const Customers = () => {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                           {customer.lastOrder}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {customer.role}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                           <button className="text-primary-600 hover:text-primary-800 mr-3">

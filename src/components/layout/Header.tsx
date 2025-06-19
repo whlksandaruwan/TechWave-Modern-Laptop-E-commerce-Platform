@@ -185,11 +185,12 @@ const Header = () => {
       className={cn(
         'fixed top-0 left-0 right-0 z-50 transition-all duration-300',
         isScrolled ? 'bg-white/90 backdrop-blur-sm shadow-md' : 'bg-transparent',
-        isAdminPage ? 'bg-primary-900 text-white' : ''
+        isAdminPage ? 'bg-primary-900 text-white' : '',
+        'w-full'
       )}
     >
-      <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16 md:h-20">
+      <div className="w-full px-2 sm:px-4 md:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-14 md:h-16">
           {/* Logo */}
           <Link 
             to="/" 

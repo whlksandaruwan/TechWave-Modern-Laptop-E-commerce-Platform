@@ -298,12 +298,26 @@ const ProductDetailPage = () => {
                 <input 
                   type="text" 
                   value={quantity} 
-                  onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
+                  onChange={(e) => {
+                    let val = Math.max(1, parseInt(e.target.value) || 1);
+                    if (product && val > product.stock) {
+                      val = product.stock;
+                      toast.warning(`Only ${product.stock} in stock.`);
+                    }
+                    setQuantity(val);
+                  }}
                   className="w-12 text-center border-none focus:ring-0 px-0 bg-transparent text-lg font-medium"
                 />
                 <button 
-                  onClick={() => setQuantity(prev => prev + 1)}
-                  className="text-gray-600 hover:text-gray-800"
+                  onClick={() => {
+                    if (product && quantity < product.stock) {
+                      setQuantity(prev => prev + 1);
+                    } else if (product && quantity === product.stock) {
+                      toast.warning(`Only ${product.stock} in stock.`);
+                    }
+                  }}
+                  className="text-gray-600 hover:text-gray-800 disabled:opacity-50"
+                  disabled={quantity >= product.stock}
                 >
                   +
                 </button>

@@ -1,133 +1,207 @@
 import { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { Filter, Grid, LayoutGrid, SlidersHorizontal } from 'lucide-react';
-import ProductGrid from '../components/products/ProductGrid';
-import ProductFilters from '../components/products/ProductFilters';
-import { FilterOptions } from '../types';
-import { cn } from '../lib/utils';
+import { useNavigate } from 'react-router-dom';
+
+interface Laptop {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  specs: {
+    processor: string;
+    ram: string;
+    storage: string;
+    display: string;
+    graphics: string;
+    battery: string;
+  };
+  images: string[];
+  stock: number;
+  categoryId: string;
+  featured: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
 
 const ProductsPage = () => {
-  const [searchParams] = useSearchParams();
-  const [filters, setFilters] = useState<FilterOptions>({
-    brands: [],
-    categories: [],
-    priceRange: { min: 0, max: 5000 },
-  });
-  const [searchQuery, setSearchQuery] = useState('');
-  const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
-  const [view, setView] = useState<'grid' | 'list'>('grid');
+  const [laptops, setLaptops] = useState<Laptop[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
+
+  // Filter state
+  const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 5000]);
+  const [initialPriceRange, setInitialPriceRange] = useState<[number, number]>([0, 5000]);
 
   useEffect(() => {
-    // Update page title
     document.title = 'Shop All Laptops - TechWave';
-    
-    // Check for search query in URL
-    const query = searchParams.get('q');
-    if (query) {
-      setSearchQuery(query);
-    }
-  }, [searchParams]);
+    const fetchLaptops = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const response = await fetch('http://localhost:3000/api/laptops');
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data: Laptop[] = await response.json();
+        setLaptops(data);
+        // Set price range based on data
+        if (data.length > 0) {
+          const prices = data.map(l => l.price);
+          const min = Math.min(...prices);
+          const max = Math.max(...prices);
+          setPriceRange([min, max]);
+          setInitialPriceRange([min, max]);
+        }
+      } catch (err) {
+        setError('Failed to load laptops. Please try again later.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchLaptops();
+  }, []);
 
-  const handleFilterChange = (newFilters: FilterOptions) => {
-    setFilters(newFilters);
+  // Extract unique brands and categories (brand from name prefix for demo)
+  const brands = Array.from(new Set(laptops.map(l => l.name.split(' ')[0])));
+  const categories = Array.from(new Set(laptops.map(l => l.categoryId)));
+
+  // Filter laptops
+  const filteredLaptops = laptops.filter(laptop => {
+    const brand = laptop.name.split(' ')[0];
+    const matchesBrand = selectedBrands.length === 0 || selectedBrands.includes(brand);
+    const matchesCategory = selectedCategories.length === 0 || selectedCategories.includes(laptop.categoryId);
+    const matchesPrice = laptop.price >= priceRange[0] && laptop.price <= priceRange[1];
+    return matchesBrand && matchesCategory && matchesPrice;
+  });
+
+  const clearFilters = () => {
+    setSelectedBrands([]);
+    setSelectedCategories([]);
+    setPriceRange(initialPriceRange);
   };
 
-  const handleSearchSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    // The search query is already in the state, and ProductGrid will use it
-  };
+  if (loading) return <div className="text-center py-16">Loading laptops...</div>;
+  if (error) return <div className="text-center py-16 text-red-500">{error}</div>;
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.3 }}
-      className="mt-16 md:mt-20"
-    >
-      <div className="bg-gray-50 py-8">
-        <div className="container mx-auto px-4">
-          <div className="max-w-5xl mx-auto">
-            <h1 className="text-3xl md:text-4xl font-bold mb-4">Shop All Laptops</h1>
-            <p className="text-gray-600 max-w-3xl">
-              Explore our comprehensive range of laptops, from high-performance gaming machines to lightweight ultrabooks, all designed to meet your specific needs.
-            </p>
-            
-            <form onSubmit={handleSearchSubmit} className="mt-6">
-              <div className="relative">
-                <input
-                  type="text"
-                  placeholder="Search for laptops by name, brand, or features..."
-                  className="w-full px-4 py-3 pl-10 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-                <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
-                  <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                  </svg>
-                </div>
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
-      
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center">
+    <div className="mt-16 md:mt-20 container mx-auto px-4 py-8">
+      <h1 className="text-3xl md:text-4xl font-bold mb-4">All Laptops</h1>
+      <div className="flex gap-8">
+        {/* Modern Filters Sidebar */}
+        <aside className="w-72 bg-white rounded-2xl shadow-lg p-6 border border-gray-100 sticky top-24 self-start h-fit">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="font-bold text-lg tracking-tight">Filters</h2>
             <button
-              onClick={() => setIsMobileFiltersOpen(true)}
-              className="lg:hidden flex items-center text-gray-700 mr-4"
+              onClick={clearFilters}
+              className="text-xs text-primary-600 hover:underline px-2 py-1 rounded transition-colors hover:bg-primary-50"
             >
-              <SlidersHorizontal className="w-5 h-5 mr-2" />
-              Filters
+              Clear All
             </button>
-            
-            <div className="hidden md:block text-gray-600">
-              Showing {searchQuery ? 'results for "' + searchQuery + '"' : 'all products'}
+          </div>
+          <div className="border-b border-gray-200 mb-4" />
+          <div className="mb-6">
+            <h3 className="font-semibold mb-3 text-gray-700">Brand</h3>
+            <div className="flex flex-col gap-2">
+              {brands.map(brand => (
+                <label key={brand} className="inline-flex items-center gap-2 cursor-pointer text-sm text-gray-600 hover:text-primary-600 transition-colors">
+                  <input
+                    type="checkbox"
+                    checked={selectedBrands.includes(brand)}
+                    onChange={e => {
+                      setSelectedBrands(prev =>
+                        e.target.checked ? [...prev, brand] : prev.filter(b => b !== brand)
+                      );
+                    }}
+                    className="accent-primary-600 w-4 h-4 rounded border-gray-300 focus:ring-primary-500 transition-all"
+                  />
+                  <span>{brand}</span>
+                </label>
+              ))}
             </div>
           </div>
-          
-          <div className="flex items-center space-x-2">
-            <div className="text-gray-600 text-sm mr-2 hidden sm:block">View:</div>
-            <button
-              onClick={() => setView('grid')}
-              className={cn(
-                "p-1.5 rounded-md transition-colors",
-                view === 'grid' ? 'bg-primary-50 text-primary-600' : 'text-gray-500 hover:bg-gray-100'
-              )}
-              aria-label="Grid view"
-            >
-              <Grid className="w-5 h-5" />
-            </button>
-            <button
-              onClick={() => setView('list')}
-              className={cn(
-                "p-1.5 rounded-md transition-colors",
-                view === 'list' ? 'bg-primary-50 text-primary-600' : 'text-gray-500 hover:bg-gray-100'
-              )}
-              aria-label="List view"
-            >
-              <LayoutGrid className="w-5 h-5" />
-            </button>
+          <div className="border-b border-gray-200 mb-4" />
+          <div className="mb-6">
+            <h3 className="font-semibold mb-3 text-gray-700">Category</h3>
+            <div className="flex flex-col gap-2">
+              {categories.map(category => (
+                <label key={category} className="inline-flex items-center gap-2 cursor-pointer text-sm text-gray-600 hover:text-primary-600 transition-colors">
+                  <input
+                    type="checkbox"
+                    checked={selectedCategories.includes(category)}
+                    onChange={e => {
+                      setSelectedCategories(prev =>
+                        e.target.checked ? [...prev, category] : prev.filter(c => c !== category)
+                      );
+                    }}
+                    className="accent-primary-600 w-4 h-4 rounded border-gray-300 focus:ring-primary-500 transition-all"
+                  />
+                  <span>{category}</span>
+                </label>
+              ))}
+            </div>
           </div>
-        </div>
-        
-        <div className="flex flex-col lg:flex-row">
-          <ProductFilters 
-            onFilterChange={handleFilterChange} 
-            isMobileFiltersOpen={isMobileFiltersOpen}
-            setIsMobileFiltersOpen={setIsMobileFiltersOpen}
-          />
-          
-          <div className="flex-1">
-            <ProductGrid filters={filters} searchQuery={searchQuery} />
+          <div className="border-b border-gray-200 mb-4" />
+          <div className="mb-2">
+            <h3 className="font-semibold mb-3 text-gray-700">Price Range</h3>
+            <div className="flex items-center gap-2 mb-2">
+              <input
+                type="number"
+                value={priceRange[0]}
+                min={initialPriceRange[0]}
+                max={priceRange[1]}
+                onChange={e => setPriceRange([Number(e.target.value), priceRange[1]])}
+                className="w-20 border rounded px-2 py-1 focus:ring-2 focus:ring-primary-200 focus:border-primary-400 transition-all"
+              />
+              <span className="text-gray-400">-</span>
+              <input
+                type="number"
+                value={priceRange[1]}
+                min={priceRange[0]}
+                max={initialPriceRange[1]}
+                onChange={e => setPriceRange([priceRange[0], Number(e.target.value)])}
+                className="w-20 border rounded px-2 py-1 focus:ring-2 focus:ring-primary-200 focus:border-primary-400 transition-all"
+              />
+            </div>
+            <div className="h-2 bg-gray-100 rounded-full relative overflow-hidden">
+              <div
+                className="absolute top-0 left-0 h-2 bg-primary-200 rounded-full transition-all"
+                style={{
+                  width: `${((priceRange[1] - priceRange[0]) / (initialPriceRange[1] - initialPriceRange[0] || 1)) * 100}%`,
+                  left: `${((priceRange[0] - initialPriceRange[0]) / (initialPriceRange[1] - initialPriceRange[0] || 1)) * 100}%`,
+                }}
+              />
+            </div>
+          </div>
+        </aside>
+        {/* Products Grid */}
+        <div className="flex-1">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {filteredLaptops.map(laptop => (
+              <div
+                key={laptop.id}
+                className="bg-white rounded-xl shadow p-4 flex flex-col cursor-pointer hover:shadow-lg transition-shadow"
+                onClick={() => navigate(`/products/${laptop.id}`)}
+                title={laptop.name}
+              >
+                <img src={laptop.images[0]} alt={laptop.name} className="w-full h-48 object-cover rounded mb-2" />
+                <h2 className="font-semibold text-lg mb-1">{laptop.name}</h2>
+                <p className="text-gray-600 text-sm mb-2 line-clamp-2">{laptop.description}</p>
+                <div className="font-bold text-primary-600 mb-2">${laptop.price}</div>
+                <div className="text-xs text-gray-500">Category: {laptop.categoryId}</div>
+                <p className="mb-1">Only {laptop.stock} items left in stock</p>
+                <button
+                  disabled={laptop.stock === 0}
+                >
+                  Add to Cart
+                </button>
+              </div>
+            ))}
           </div>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 };
 
