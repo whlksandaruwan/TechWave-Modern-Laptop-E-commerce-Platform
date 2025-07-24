@@ -237,6 +237,17 @@ const Header = () => {
                 About
               </NavLink>
             )}
+            {!isAdminPage && (
+              <NavLink 
+                to="/contact" 
+                className={({ isActive }) => cn(
+                  'font-medium transition-colors hover:text-primary-600',
+                  isActive ? 'text-primary-600' : 'text-gray-700'
+                )}
+              >
+                Contact
+              </NavLink>
+            )}
             {isAuthenticated && isAdminPage && renderAdminNavLinks()}
           </nav>
 
@@ -373,6 +384,16 @@ const Header = () => {
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 About
+              </NavLink>
+              <NavLink 
+                to="/contact" 
+                className={({ isActive }) => cn(
+                  'px-4 py-2 rounded-md font-medium',
+                  isActive ? 'bg-primary-50 text-primary-600' : 'text-gray-700'
+                )}
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Contact
               </NavLink>
               {isAuthenticated && user?.isAdmin && (
                 <>
