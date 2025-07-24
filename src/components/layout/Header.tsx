@@ -215,16 +215,17 @@ const Header = () => {
             >
               Home
             </NavLink>
-            <NavLink 
-              to="/products" 
-              className={({ isActive }) => cn(
-                'font-medium transition-colors hover:text-primary-600',
-                isActive ? 'text-primary-600' : 'text-gray-700',
-                isAdminPage && 'text-white hover:text-primary-200'
-              )}
-            >
-              Products
-            </NavLink>
+            {!isAdminPage && (
+              <NavLink 
+                to="/products" 
+                className={({ isActive }) => cn(
+                  'font-medium transition-colors hover:text-primary-600',
+                  isActive ? 'text-primary-600' : 'text-gray-700'
+                )}
+              >
+                Products
+              </NavLink>
+            )}
             {isAuthenticated && isAdminPage && renderAdminNavLinks()}
           </nav>
 

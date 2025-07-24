@@ -26,6 +26,7 @@ const AdminOrders = lazy(() => import('./pages/admin/Orders'));
 const AdminCustomers = lazy(() => import('./pages/admin/Customers'));
 const AdminAddProduct = lazy(() => import('./pages/admin/AddProduct'));
 const AdminEditProduct = lazy(() => import('./pages/admin/EditProduct'));
+const AdminAnalytics = lazy(() => import('./pages/admin/Analytics'));
 
 function App() {
   const { initialized } = useAuthStore();
@@ -61,6 +62,11 @@ function App() {
             <Route path="admin" element={
               <RoleBasedRoute allowedRoles={['admin']}>
                 <AdminDashboard />
+              </RoleBasedRoute>
+            } />
+            <Route path="admin/analytics" element={
+              <RoleBasedRoute allowedRoles={['admin', 'manager']}>
+                <AdminAnalytics />
               </RoleBasedRoute>
             } />
             <Route path="admin/products" element={

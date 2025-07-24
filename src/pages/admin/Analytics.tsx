@@ -9,7 +9,9 @@ import {
   DollarSign,
   ShoppingBag,
   Users,
-  Eye
+  Eye,
+  ArrowUpRight,
+  ArrowDownRight
 } from 'lucide-react';
 import { formatPrice } from '../../lib/utils';
 
@@ -40,16 +42,27 @@ const Analytics = () => {
   const fetchAnalyticsData = async () => {
     setIsLoading(true);
     try {
-      // Mock sales data - in real app, this would come from your analytics API
-      const mockSalesData: SalesData[] = [
-        { date: '2024-01-01', revenue: 12500, orders: 45 },
-        { date: '2024-01-02', revenue: 15200, orders: 52 },
-        { date: '2024-01-03', revenue: 9800, orders: 38 },
-        { date: '2024-01-04', revenue: 18600, orders: 67 },
-        { date: '2024-01-05', revenue: 22100, orders: 78 },
-        { date: '2024-01-06', revenue: 16900, orders: 59 },
-        { date: '2024-01-07', revenue: 14300, orders: 48 },
-      ];
+      // Generate realistic mock data based on time range
+      const days = timeRange === '7d' ? 7 : timeRange === '30d' ? 30 : timeRange === '90d' ? 90 : 365;
+      const mockSalesData: SalesData[] = [];
+      
+      for (let i = days - 1; i >= 0; i--) {
+        const date = new Date();
+        date.setDate(date.getDate() - i);
+        
+        // Generate realistic revenue (higher on weekends, seasonal variations)
+        const isWeekend = date.getDay() === 0 || date.getDay() === 6;
+        const baseRevenue = isWeekend ? 18000 : 12000;
+        const variation = Math.random() * 8000 - 4000;
+        const revenue = Math.max(5000, baseRevenue + variation);
+        const orders = Math.floor(revenue / 180); // Average order value ~$180
+        
+        mockSalesData.push({
+          date: date.toISOString().split('T')[0],
+          revenue: Math.round(revenue),
+          orders
+        });
+      }
 
       const mockCategoryData: CategoryData[] = [
         { name: 'Gaming Laptops', value: 45200, percentage: 35, color: '#3B82F6' },
@@ -70,6 +83,11 @@ const Analytics = () => {
   const totalRevenue = salesData.reduce((sum, day) => sum + day.revenue, 0);
   const totalOrders = salesData.reduce((sum, day) => sum + day.orders, 0);
   const avgOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
+  
+  // Calculate growth compared to previous period
+  const currentPeriodRevenue = salesData.slice(-Math.floor(salesData.length / 2)).reduce((sum, day) => sum + day.revenue, 0);
+  const previousPeriodRevenue = salesData.slice(0, Math.floor(salesData.length / 2)).reduce((sum, day) => sum + day.revenue, 0);
+  const revenueGrowth = previousPeriodRevenue > 0 ? ((currentPeriodRevenue - previousPeriodRevenue) / previousPeriodRevenue) * 100 : 0;
 
   if (isLoading) {
     return (
@@ -125,6 +143,17 @@ const Analytics = () => {
             <div>
               <p className="text-sm font-medium text-gray-600">Total Revenue</p>
               <p className="text-2xl font-bold text-gray-900 mt-1">{formatPrice(totalRevenue)}</p>
+              <div className="flex items-center mt-2">
+                {revenueGrowth >= 0 ? (
+                  <ArrowUpRight className="w-4 h-4 text-green-500 mr-1" />
+                ) : (
+                  <ArrowDownRight className="w-4 h-4 text-red-500 mr-1" />
+                )}
+                <span className={`text-sm font-medium ${revenueGrowth >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                  {Math.abs(revenueGrowth).toFixed(1)}%
+                </span>
+                <span className="text-sm text-gray-500 ml-1">vs previous period</span>
+              </div>
             </div>
             <div className="p-3 rounded-full bg-green-500">
               <DollarSign className="w-6 h-6 text-white" />
@@ -142,6 +171,11 @@ const Analytics = () => {
             <div>
               <p className="text-sm font-medium text-gray-600">Total Orders</p>
               <p className="text-2xl font-bold text-gray-900 mt-1">{totalOrders.toLocaleString()}</p>
+              <div className="flex items-center mt-2">
+                <ArrowUpRight className="w-4 h-4 text-green-500 mr-1" />
+                <span className="text-sm font-medium text-green-600">8.2%</span>
+                <span className="text-sm text-gray-500 ml-1">vs previous period</span>
+              </div>
             </div>
             <div className="p-3 rounded-full bg-blue-500">
               <ShoppingBag className="w-6 h-6 text-white" />
@@ -159,6 +193,11 @@ const Analytics = () => {
             <div>
               <p className="text-sm font-medium text-gray-600">Avg Order Value</p>
               <p className="text-2xl font-bold text-gray-900 mt-1">{formatPrice(avgOrderValue)}</p>
+              <div className="flex items-center mt-2">
+                <ArrowUpRight className="w-4 h-4 text-green-500 mr-1" />
+                <span className="text-sm font-medium text-green-600">5.4%</span>
+                <span className="text-sm text-gray-500 ml-1">vs previous period</span>
+              </div>
             </div>
             <div className="p-3 rounded-full bg-purple-500">
               <TrendingUp className="w-6 h-6 text-white" />
@@ -176,21 +215,25 @@ const Analytics = () => {
         >
           <div className="p-6 border-b border-gray-100">
             <h2 className="text-lg font-semibold text-gray-900">Revenue Trend</h2>
+            <p className="text-sm text-gray-500 mt-1">Daily revenue over the selected period</p>
           </div>
           <div className="p-6">
-            <div className="h-64 flex items-end justify-between space-x-2">
-              {salesData.map((day, index) => {
+            <div className="h-64 flex items-end justify-between space-x-1">
+              {salesData.slice(-14).map((day, index) => {
                 const maxRevenue = Math.max(...salesData.map(d => d.revenue));
                 const height = (day.revenue / maxRevenue) * 100;
                 return (
-                  <div key={index} className="flex-1 flex flex-col items-center">
+                  <div key={index} className="flex-1 flex flex-col items-center group">
                     <div
-                      className="w-full bg-primary-500 rounded-t-sm transition-all duration-300 hover:bg-primary-600"
-                      style={{ height: `${height}%` }}
-                      title={`${formatPrice(day.revenue)} - ${day.orders} orders`}
-                    />
-                    <span className="text-xs text-gray-500 mt-2">
-                      {new Date(day.date).toLocaleDateString('en-US', { weekday: 'short' })}
+                      className="w-full bg-primary-500 rounded-t-sm transition-all duration-300 hover:bg-primary-600 cursor-pointer relative"
+                      style={{ height: `${height}%`, minHeight: '4px' }}
+                    >
+                      <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                        {formatPrice(day.revenue)}
+                      </div>
+                    </div>
+                    <span className="text-xs text-gray-500 mt-2 transform -rotate-45 origin-left">
+                      {new Date(day.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                     </span>
                   </div>
                 );
@@ -207,6 +250,7 @@ const Analytics = () => {
         >
           <div className="p-6 border-b border-gray-100">
             <h2 className="text-lg font-semibold text-gray-900">Sales by Category</h2>
+            <p className="text-sm text-gray-500 mt-1">Revenue breakdown by product category</p>
           </div>
           <div className="p-6">
             <div className="space-y-4">
@@ -229,15 +273,16 @@ const Analytics = () => {
               ))}
             </div>
             <div className="mt-6">
-              <div className="flex rounded-full overflow-hidden h-2">
+              <div className="flex rounded-full overflow-hidden h-3">
                 {categoryData.map((category, index) => (
                   <div
                     key={index}
-                    className="h-full"
+                    className="h-full transition-all duration-300 hover:opacity-80"
                     style={{
                       backgroundColor: category.color,
                       width: `${category.percentage}%`
                     }}
+                    title={`${category.name}: ${category.percentage}%`}
                   />
                 ))}
               </div>
@@ -254,24 +299,29 @@ const Analytics = () => {
       >
         <div className="p-6 border-b border-gray-100">
           <h2 className="text-lg font-semibold text-gray-900">Performance Metrics</h2>
+          <p className="text-sm text-gray-500 mt-1">Key performance indicators for your store</p>
         </div>
         <div className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <div className="text-center">
+            <div className="text-center p-4 bg-gray-50 rounded-lg">
               <div className="text-2xl font-bold text-gray-900">2.4%</div>
-              <div className="text-sm text-gray-500">Conversion Rate</div>
+              <div className="text-sm text-gray-500 mt-1">Conversion Rate</div>
+              <div className="text-xs text-green-600 mt-1">+0.3% from last month</div>
             </div>
-            <div className="text-center">
+            <div className="text-center p-4 bg-gray-50 rounded-lg">
               <div className="text-2xl font-bold text-gray-900">3.2</div>
-              <div className="text-sm text-gray-500">Avg Items per Order</div>
+              <div className="text-sm text-gray-500 mt-1">Avg Items per Order</div>
+              <div className="text-xs text-green-600 mt-1">+0.1 from last month</div>
             </div>
-            <div className="text-center">
+            <div className="text-center p-4 bg-gray-50 rounded-lg">
               <div className="text-2xl font-bold text-gray-900">12.5%</div>
-              <div className="text-sm text-gray-500">Return Rate</div>
+              <div className="text-sm text-gray-500 mt-1">Return Rate</div>
+              <div className="text-xs text-red-600 mt-1">+1.2% from last month</div>
             </div>
-            <div className="text-center">
+            <div className="text-center p-4 bg-gray-50 rounded-lg">
               <div className="text-2xl font-bold text-gray-900">4.8</div>
-              <div className="text-sm text-gray-500">Customer Rating</div>
+              <div className="text-sm text-gray-500 mt-1">Customer Rating</div>
+              <div className="text-xs text-green-600 mt-1">+0.2 from last month</div>
             </div>
           </div>
         </div>
