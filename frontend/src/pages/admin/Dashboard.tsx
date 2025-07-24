@@ -4,9 +4,7 @@ import {
   DollarSign, 
   ShoppingBag, 
   Users, 
-  Package, 
-  TrendingUp, 
-  TrendingDown,
+  Package,  
   Eye,
   BarChart3,
   PieChart,
@@ -210,7 +208,7 @@ const Dashboard = () => {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="w-full max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <StatCard
           title="Total Revenue"
           value={formatPrice(stats.totalRevenue)}
