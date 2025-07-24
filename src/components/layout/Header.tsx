@@ -226,6 +226,17 @@ const Header = () => {
                 Products
               </NavLink>
             )}
+            {!isAdminPage && (
+              <NavLink 
+                to="/about" 
+                className={({ isActive }) => cn(
+                  'font-medium transition-colors hover:text-primary-600',
+                  isActive ? 'text-primary-600' : 'text-gray-700'
+                )}
+              >
+                About
+              </NavLink>
+            )}
             {isAuthenticated && isAdminPage && renderAdminNavLinks()}
           </nav>
 
@@ -352,6 +363,16 @@ const Header = () => {
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 Products
+              </NavLink>
+              <NavLink 
+                to="/about" 
+                className={({ isActive }) => cn(
+                  'px-4 py-2 rounded-md font-medium',
+                  isActive ? 'bg-primary-50 text-primary-600' : 'text-gray-700'
+                )}
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                About
               </NavLink>
               {isAuthenticated && user?.isAdmin && (
                 <>
