@@ -24,7 +24,7 @@ async function bootstrap() {
       },
       images: ['https://example.com/macbook-pro-1.jpg'],
       stock: 10,
-      categoryId: '1', // You'll need to create categories first
+      categoryId: 'business',
       featured: true
     },
     {
@@ -41,7 +41,7 @@ async function bootstrap() {
       },
       images: ['https://example.com/dell-xps-1.jpg'],
       stock: 15,
-      categoryId: '1',
+      categoryId: 'creator',
       featured: true
     },
     {
@@ -58,8 +58,59 @@ async function bootstrap() {
       },
       images: ['https://example.com/thinkpad-1.jpg'],
       stock: 20,
-      categoryId: '1',
+      categoryId: 'business',
       featured: false
+    },
+    {
+      name: 'ASUS ROG Strix G15',
+      description: 'Gaming powerhouse with RTX graphics and high refresh rate display.',
+      price: 1599.99,
+      specs: {
+        processor: 'AMD Ryzen 7 6800H',
+        ram: '16GB DDR5',
+        storage: '1TB NVMe SSD',
+        display: '15.6" 144Hz FHD',
+        graphics: 'NVIDIA RTX 4060',
+        battery: 'Up to 8 hours'
+      },
+      images: ['https://images.pexels.com/photos/7974/pexels-photo.jpg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2'],
+      stock: 25,
+      categoryId: 'gaming',
+      featured: true
+    },
+    {
+      name: 'MacBook Air M2',
+      description: 'Ultra-portable laptop with incredible battery life and performance.',
+      price: 1199.99,
+      specs: {
+        processor: 'Apple M2',
+        ram: '8GB Unified Memory',
+        storage: '256GB SSD',
+        display: '13.6" Liquid Retina',
+        graphics: 'M2 Integrated GPU',
+        battery: 'Up to 18 hours'
+      },
+      images: ['https://images.pexels.com/photos/3394346/pexels-photo-3394346.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2'],
+      stock: 30,
+      categoryId: 'ultrabook',
+      featured: false
+    },
+    {
+      name: 'MSI Creator Z16P',
+      description: 'Professional creator laptop with studio-grade display and powerful specs.',
+      price: 2299.99,
+      specs: {
+        processor: 'Intel Core i7-12700H',
+        ram: '32GB DDR5',
+        storage: '1TB NVMe SSD',
+        display: '16" 4K Mini LED',
+        graphics: 'NVIDIA RTX 4070',
+        battery: 'Up to 10 hours'
+      },
+      images: ['https://images.pexels.com/photos/4792733/pexels-photo-4792733.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2'],
+      stock: 12,
+      categoryId: 'creator',
+      featured: true
     }
   ];
 

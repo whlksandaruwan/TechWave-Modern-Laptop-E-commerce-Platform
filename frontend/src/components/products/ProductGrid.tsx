@@ -68,16 +68,12 @@ const ProductGrid = ({ filters, searchQuery }: ProductGridProps) => {
 
         if (categoryParam) {
           filteredData = filteredData.filter(p =>
-            p.categoryId.toLowerCase() === categoryParam.toLowerCase()
+            p.categoryId.toLowerCase() === categoryParam.toLowerCase() ||
+            p.categoryId === categoryParam
           );
         }
 
-        // Note: The backend doesn't seem to expose 'brand' or 'discountPercentage' directly
-        // You might need to adjust your backend or frontend data transformation
-        // if these filters are critical based on the current API response.
         if (brandParam) {
-          // This filter might not work as expected without 'brand' in Laptop interface
-          // For now, I'm assuming 'name' or 'description' could contain brand info if not a direct field
           filteredData = filteredData.filter(p =>
             p.name.toLowerCase().includes(brandParam.toLowerCase())
           );

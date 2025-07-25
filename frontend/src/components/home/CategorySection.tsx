@@ -4,28 +4,28 @@ import { motion } from 'framer-motion';
 const CategorySection = () => {
   const categories = [
     { 
-      id: 'gaming', 
+      id: 'gaming',
       name: 'Gaming Laptops', 
       description: 'High-performance machines built for immersive gaming experiences.',
       image: 'https://images.pexels.com/photos/7974/pexels-photo.jpg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
       color: 'from-red-500/80 to-purple-600/80'
     },
     { 
-      id: 'business', 
+      id: 'business',
       name: 'Business Laptops', 
       description: 'Professional-grade laptops designed for productivity and reliability.',
       image: 'https://images.pexels.com/photos/18105/pexels-photo.jpg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
       color: 'from-blue-500/80 to-indigo-600/80'
     },
     { 
-      id: 'ultraportable', 
+      id: 'ultrabook',
       name: 'Ultrabooks', 
       description: 'Thin and light laptops offering the perfect balance of portability and performance.',
       image: 'https://images.pexels.com/photos/3394346/pexels-photo-3394346.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
       color: 'from-teal-500/80 to-emerald-600/80'
     },
     { 
-      id: 'content-creation', 
+      id: 'creator',
       name: 'Creator Laptops', 
       description: 'Powerful machines optimized for video editing, 3D modeling, and design work.',
       image: 'https://images.pexels.com/photos/4792733/pexels-photo-4792733.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',

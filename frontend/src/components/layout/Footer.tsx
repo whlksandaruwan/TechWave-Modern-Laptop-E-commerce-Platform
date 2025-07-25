@@ -59,8 +59,13 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
-                <Link to="/products?category=ultraportable" className="text-gray-400 hover:text-white transition-colors">
+                <Link to="/products?category=ultrabook" className="text-gray-400 hover:text-white transition-colors">
                   Ultrabooks
+                </Link>
+              </li>
+              <li>
+                <Link to="/products?category=creator" className="text-gray-400 hover:text-white transition-colors">
+                  Creator Laptops
                 </Link>
               </li>
               <li>
