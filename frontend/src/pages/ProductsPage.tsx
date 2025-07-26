@@ -158,12 +158,14 @@ const ProductsPage = () => {
         </div>
       </div>
 
-      {/* Mobile Filters */}
-      <ProductFilters
-        onFilterChange={handleFilterChange}
-        isMobileFiltersOpen={isMobileFiltersOpen}
-        setIsMobileFiltersOpen={setIsMobileFiltersOpen}
-      />
+      {/* Mobile Filters (only shown on small screens) */}
+      <div className="lg:hidden">
+        <ProductFilters
+          onFilterChange={handleFilterChange}
+          isMobileFiltersOpen={isMobileFiltersOpen}
+          setIsMobileFiltersOpen={setIsMobileFiltersOpen}
+        />
+      </div>
     </motion.div>
   );
 };
