@@ -61,9 +61,11 @@ const ProductFilters = ({
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
-        // Extract unique brands from laptops and ensure they are strings
-        const uniqueBrands = Array.from(new Set(data.map((laptop: any) => laptop.brand)))
-          .filter((brand): brand is string => typeof brand === 'string');
+        // Extract unique brands from laptop names (first word)
+        const uniqueBrands = Array.from(new Set(data.map((laptop: any) => {
+          const firstWord = laptop.name.split(' ')[0];
+          return firstWord;
+        }))).filter((brand): brand is string => typeof brand === 'string');
         setBrands(uniqueBrands);
       } catch (error) {
         console.error('Failed to fetch brands:', error);
