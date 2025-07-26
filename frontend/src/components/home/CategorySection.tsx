@@ -7,28 +7,28 @@ const CategorySection = () => {
       id: 'gaming', 
       name: 'Gaming Laptops', 
       description: 'High-performance machines built for immersive gaming experiences.',
-      image: 'https://images.pexels.com/photos/7974/pexels-photo.jpg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
+      image: 'https://s.yimg.com/uu/api/res/1.2/7EbyFHgyIooLzHvPmte2mg--~B/Zmk9c3RyaW07aD03MjA7dz0xMjgwO2FwcGlkPXl0YWNoeW9u/https://s.yimg.com/os/creatr-uploaded-images/2025-06/9f1a70b0-534e-11f0-affb-96a21a67d03d',
       color: 'from-red-500/80 to-purple-600/80'
     },
     { 
       id: 'business', 
       name: 'Business Laptops', 
       description: 'Professional-grade laptops designed for productivity and reliability.',
-      image: 'https://images.pexels.com/photos/18105/pexels-photo.jpg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
+      image: 'https://www.techfinitive.com/wp-content/uploads/2023/11/best-laptop-for-business-jpg.webp',
       color: 'from-blue-500/80 to-indigo-600/80'
     },
     { 
       id: 'ultraportable', 
       name: 'Ultrabooks', 
       description: 'Thin and light laptops offering the perfect balance of portability and performance.',
-      image: 'https://images.pexels.com/photos/3394346/pexels-photo-3394346.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
+      image: 'https://www.exhibit.tech/wp-content/uploads/2023/12/yoga_9i_raptor_lake_teaser-1200x675.webp',
       color: 'from-teal-500/80 to-emerald-600/80'
     },
     { 
       id: 'content-creation', 
       name: 'Creator Laptops', 
       description: 'Powerful machines optimized for video editing, 3D modeling, and design work.',
-      image: 'https://images.pexels.com/photos/4792733/pexels-photo-4792733.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
+      image: 'https://www.gigabyte.com/FileUpload/Global/Insight/Article/141/o202005081702401288.jpg',
       color: 'from-orange-500/80 to-pink-600/80'
     }
   ];
