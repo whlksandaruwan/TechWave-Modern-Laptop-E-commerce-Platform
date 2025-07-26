@@ -51,53 +51,31 @@ const ProductGrid = ({ filters, searchQuery }: ProductGridProps) => {
       try {
         setLoading(true);
         setError(null);
+        console.log('Fetching products from API...');
         const response = await fetch('http://localhost:3000/api/laptops');
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data: Laptop[] = await response.json();
+        console.log('Fetched products:', data);
 
         let filteredData = [...data];
 
         // Apply filters from URL search params
         const categoryParam = searchParams.get('category');
-        const brandParam = searchParams.get('brand');
-        const priceMinParam = searchParams.get('priceMin');
-        const priceMaxParam = searchParams.get('priceMax');
-        const saleParam = searchParams.get('sale');
+        console.log('Category filter:', categoryParam);
 
         if (categoryParam) {
           filteredData = filteredData.filter(p =>
             p.categoryId.toLowerCase() === categoryParam.toLowerCase() ||
             p.categoryId === categoryParam
           );
-        }
-
-        if (brandParam) {
-          filteredData = filteredData.filter(p =>
-            p.name.toLowerCase().includes(brandParam.toLowerCase())
-          );
-        }
-
-        if (priceMinParam) {
-          const min = parseFloat(priceMinParam);
-          filteredData = filteredData.filter(p => p.price >= min);
-        }
-
-        if (priceMaxParam) {
-          const max = parseFloat(priceMaxParam);
-          filteredData = filteredData.filter(p => p.price <= max);
-        }
-
-        if (saleParam === 'true') {
-          // This filter needs 'discountPercentage' in Laptop interface or calculated from backend
-          filteredData = filteredData.filter(p => false); // Placeholder as no discount info
+          console.log('Filtered by category:', filteredData);
         }
 
         // Apply additional filters if provided as props
         if (filters) {
           if (filters.brands.length > 0) {
-            // This filter might need adjustment based on how brands are associated in your backend
             filteredData = filteredData.filter(p =>
               filters.brands.some(brand => p.name.toLowerCase().includes(brand.toLowerCase()))
             );
@@ -113,11 +91,6 @@ const ProductGrid = ({ filters, searchQuery }: ProductGridProps) => {
             filteredData = filteredData.filter(p =>
               p.price >= filters.priceRange.min && p.price <= filters.priceRange.max
             );
-          }
-
-          if (filters.rating) {
-            // This filter needs 'rating' in Laptop interface or calculated from backend
-            filteredData = filteredData.filter(p => false); // Placeholder as no rating info
           }
         }
 
@@ -135,6 +108,7 @@ const ProductGrid = ({ filters, searchQuery }: ProductGridProps) => {
           );
         }
 
+        console.log('Final filtered products:', filteredData);
         setProducts(filteredData);
       } catch (err) {
         console.error("Failed to fetch products:", err);
@@ -174,11 +148,26 @@ const ProductGrid = ({ filters, searchQuery }: ProductGridProps) => {
   };
 
   if (loading) {
-    return <div className="text-center py-16">Loading products...</div>;
+    return (
+      <div className="flex justify-center py-16">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+      </div>
+    );
   }
 
   if (error) {
-    return <div className="text-center py-16 text-red-500">Error: {error}</div>;
+    return (
+      <div className="text-center py-16 text-red-500">
+        <h3 className="text-xl font-medium mb-2">Error Loading Products</h3>
+        <p className="mb-4">{error}</p>
+        <button 
+          onClick={() => window.location.reload()}
+          className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
+        >
+          Retry
+        </button>
+      </div>
+    );
   }
 
   if (products.length === 0) {
@@ -197,7 +186,7 @@ const ProductGrid = ({ filters, searchQuery }: ProductGridProps) => {
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
       {products.map((product, index) => (
         <motion.div
           key={product.id}
@@ -207,12 +196,12 @@ const ProductGrid = ({ filters, searchQuery }: ProductGridProps) => {
         >
           <Link
             to={`/products/${product.id}`}
-            className="group block bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow relative"
+            className="group block bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow relative"
           >
             {/* Product image */}
-            <div className="aspect-[4/3] overflow-hidden bg-gray-100">
+            <div className="aspect-square overflow-hidden bg-gray-100">
               <img
-                src={product.images[0]} // Assuming images array is not empty
+                src={product.images[0] || 'https://images.pexels.com/photos/7974/pexels-photo.jpg?auto=compress&cs=tinysrgb&w=400&h=400&dpr=2'}
                 alt={product.name}
                 className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
               />
@@ -236,45 +225,45 @@ const ProductGrid = ({ filters, searchQuery }: ProductGridProps) => {
               </button>
             </div>
 
-            {/* Discount badge */}
-            {/* Assuming no discountPercentage directly from backend for now */}
-            {/* {product.discountPercentage && (
-              <div className="absolute top-4 left-4 bg-accent-500 text-white text-xs font-bold px-2 py-1 rounded">
-                {product.discountPercentage}% OFF
+            {/* Stock status */}
+            {product.stock < 5 && product.stock > 0 && (
+              <div className="absolute top-4 left-4 bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded">
+                Only {product.stock} left
               </div>
-            )} */}
+            )}
+            
+            {product.stock === 0 && (
+              <div className="absolute top-4 left-4 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">
+                Out of Stock
+              </div>
+            )}
 
             {/* Product info */}
             <div className="p-6">
-              <div className="text-sm text-gray-500 mb-2">Category ID: {product.categoryId}</div> {/* Displaying category ID for now */}
+              <div className="text-sm text-primary-600 font-medium mb-2 capitalize">{product.categoryId}</div>
               <h3 className="font-semibold text-lg mb-2 group-hover:text-primary-600 transition-colors">
                 {product.name}
               </h3>
               <p className="text-gray-600 text-sm mb-4 line-clamp-2">
                 {product.description}
               </p>
+              
+              {/* Key specs */}
+              <div className="text-xs text-gray-500 mb-3 space-y-1">
+                <div>💻 {product.specs.processor}</div>
+                <div>🧠 {product.specs.ram}</div>
+                <div>💾 {product.specs.storage}</div>
+              </div>
+              
               <div className="flex items-end justify-between">
                 <div>
                   <span className="font-bold text-lg">
                     {formatPrice(product.price)}
                   </span>
                 </div>
-                {/* Assuming no rating or numReviews from backend for now */}
-                {/* <div className="flex items-center">
-                  <div className="flex items-center">
-                    {Array.from({ length: 5 }).map((_, i) => (
-                      <svg
-                        key={i}
-                        className={`w-4 h-4 ${i < Math.floor(product.rating) ? "text-yellow-400" : "text-gray-300"}`}
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                      >
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                      </svg>
-                    ))}
-                  </div>
-                  <span className="text-xs text-gray-500 ml-1">({product.numReviews})</span>
-                </div> */}
+                <div className="text-xs text-gray-500">
+                  {product.stock > 0 ? `${product.stock} in stock` : 'Out of stock'}
+                </div>
               </div>
             </div>
           </Link>

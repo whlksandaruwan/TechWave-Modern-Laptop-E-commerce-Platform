@@ -42,34 +42,37 @@ const ProductFilters = ({
   useEffect(() => {
     const fetchCategories = async () => {
       try {
+        console.log('Fetching categories...');
         const response = await fetch('http://localhost:3000/api/categories');
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
+        console.log('Categories fetched:', data);
         setCategories(data);
       } catch (error) {
         console.error('Failed to fetch categories:', error);
-        toast.error('Failed to load categories. Please try again later.');
       }
     };
 
     const fetchBrands = async () => {
       try {
+        console.log('Fetching brands...');
         const response = await fetch('http://localhost:3000/api/laptops');
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
+        console.log('Laptops for brands:', data);
         // Extract unique brands from laptop names (first word)
         const uniqueBrands = Array.from(new Set(data.map((laptop: any) => {
           const firstWord = laptop.name.split(' ')[0];
           return firstWord;
         }))).filter((brand): brand is string => typeof brand === 'string');
+        console.log('Extracted brands:', uniqueBrands);
         setBrands(uniqueBrands);
       } catch (error) {
         console.error('Failed to fetch brands:', error);
-        toast.error('Failed to load brands. Please try again later.');
       } finally {
         setIsLoading(false);
       }

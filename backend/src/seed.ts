@@ -22,7 +22,7 @@ async function bootstrap() {
         graphics: 'M3 Pro Integrated GPU',
         battery: 'Up to 22 hours'
       },
-      images: ['https://example.com/macbook-pro-1.jpg'],
+      images: ['https://images.pexels.com/photos/3394346/pexels-photo-3394346.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&dpr=2'],
       stock: 10,
       categoryId: 'business',
       featured: true
@@ -39,7 +39,7 @@ async function bootstrap() {
         graphics: 'NVIDIA RTX 4070',
         battery: 'Up to 13 hours'
       },
-      images: ['https://example.com/dell-xps-1.jpg'],
+      images: ['https://images.pexels.com/photos/4792733/pexels-photo-4792733.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&dpr=2'],
       stock: 15,
       categoryId: 'creator',
       featured: true
@@ -56,7 +56,7 @@ async function bootstrap() {
         graphics: 'Intel Iris Xe',
         battery: 'Up to 15 hours'
       },
-      images: ['https://example.com/thinkpad-1.jpg'],
+      images: ['https://images.pexels.com/photos/1181371/pexels-photo-1181371.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&dpr=2'],
       stock: 20,
       categoryId: 'business',
       featured: false
@@ -90,7 +90,7 @@ async function bootstrap() {
         graphics: 'M2 Integrated GPU',
         battery: 'Up to 18 hours'
       },
-      images: ['https://images.pexels.com/photos/3394346/pexels-photo-3394346.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2'],
+      images: ['https://images.pexels.com/photos/1029757/pexels-photo-1029757.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&dpr=2'],
       stock: 30,
       categoryId: 'ultrabook',
       featured: false
@@ -107,9 +107,43 @@ async function bootstrap() {
         graphics: 'NVIDIA RTX 4070',
         battery: 'Up to 10 hours'
       },
-      images: ['https://images.pexels.com/photos/4792733/pexels-photo-4792733.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2'],
+      images: ['https://images.pexels.com/photos/18105/pexels-photo.jpg?auto=compress&cs=tinysrgb&w=800&h=600&dpr=2'],
       stock: 12,
       categoryId: 'creator',
+      featured: true
+    },
+    {
+      name: 'HP Pavilion Gaming 15',
+      description: 'Affordable gaming laptop with solid performance for casual gamers.',
+      price: 899.99,
+      specs: {
+        processor: 'AMD Ryzen 5 5600H',
+        ram: '8GB DDR4',
+        storage: '512GB SSD',
+        display: '15.6" FHD IPS',
+        graphics: 'NVIDIA GTX 1650',
+        battery: 'Up to 6 hours'
+      },
+      images: ['https://images.pexels.com/photos/2047905/pexels-photo-2047905.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&dpr=2'],
+      stock: 18,
+      categoryId: 'gaming',
+      featured: false
+    },
+    {
+      name: 'Surface Laptop 5',
+      description: 'Elegant ultrabook with premium build quality and excellent display.',
+      price: 1299.99,
+      specs: {
+        processor: 'Intel Core i5-1235U',
+        ram: '8GB LPDDR5',
+        storage: '256GB SSD',
+        display: '13.5" PixelSense',
+        graphics: 'Intel Iris Xe',
+        battery: 'Up to 17 hours'
+      },
+      images: ['https://images.pexels.com/photos/1029757/pexels-photo-1029757.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&dpr=2'],
+      stock: 22,
+      categoryId: 'ultrabook',
       featured: true
     }
   ];
