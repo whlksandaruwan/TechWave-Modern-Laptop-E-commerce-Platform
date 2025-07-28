@@ -15,9 +15,30 @@ export class AuthController {
 
   @Post('register')
   async register(
-    @Body() registerDto: { email: string; password: string; firstName: string; lastName: string },
+    @Body() registerDto: { 
+      email: string; 
+      password: string; 
+      firstName: string; 
+      lastName: string;
+      name?: string;
+    },
   ) {
-    return this.authService.register(registerDto);
+    // Handle both name and firstName/lastName formats
+    let firstName = registerDto.firstName;
+    let lastName = registerDto.lastName;
+    
+    if (registerDto.name && !firstName && !lastName) {
+      const nameParts = registerDto.name.trim().split(' ');
+      firstName = nameParts[0];
+      lastName = nameParts.slice(1).join(' ') || '';
+    }
+    
+    return this.authService.register({
+      email: registerDto.email,
+      password: registerDto.password,
+      firstName,
+      lastName,
+    });
   }
 
   @Post('login')

@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import HeroSection from '../components/home/HeroSection';
 import FeaturedProducts from '../components/home/FeaturedProducts';
 import CategorySection from '../components/home/CategorySection';
+import NewProductsBanner from '../components/home/NewProductsBanner';
 import TestimonialsSection from '../components/home/TestimonialsSection';
 import CTASection from '../components/home/CTASection';
 
@@ -22,6 +23,7 @@ const HomePage = () => {
       <HeroSection />
       <FeaturedProducts />
       <CategorySection />
+      <NewProductsBanner />
       <TestimonialsSection />
       <CTASection />
     </motion.div>

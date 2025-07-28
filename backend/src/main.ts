@@ -8,10 +8,10 @@ async function bootstrap() {
   
   // Configure CORS
   app.enableCors({
-    origin: ['http://localhost:5173', 'http://localhost:5174'],
+    origin: ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:3000'],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     credentials: true,
-    allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Origin', 'X-Requested-With'],
   });
   
   // Set global API prefix
