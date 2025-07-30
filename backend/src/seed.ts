@@ -24,7 +24,7 @@ async function bootstrap() {
       },
       images: ['https://images.pexels.com/photos/3394346/pexels-photo-3394346.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&dpr=2'],
       stock: 10,
-      categoryId: 'business',
+      categoryId: 'apple',
       featured: true
     },
     {
@@ -92,8 +92,8 @@ async function bootstrap() {
       },
       images: ['https://images.pexels.com/photos/1029757/pexels-photo-1029757.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&dpr=2'],
       stock: 30,
-      categoryId: 'ultrabook',
-      featured: false
+      categoryId: 'apple',
+      featured: true
     },
     {
       name: 'MSI Creator Z16P',
@@ -145,6 +145,40 @@ async function bootstrap() {
       stock: 22,
       categoryId: 'ultrabook',
       featured: true
+    },
+    {
+      name: 'MacBook Pro 14" M3 Max',
+      description: 'The ultimate MacBook Pro with M3 Max chip for extreme performance.',
+      price: 3499.99,
+      specs: {
+        processor: 'Apple M3 Max',
+        ram: '32GB Unified Memory',
+        storage: '1TB SSD',
+        display: '14.2-inch Liquid Retina XDR',
+        graphics: 'M3 Max Integrated GPU',
+        battery: 'Up to 22 hours'
+      },
+      images: ['https://images.pexels.com/photos/3394346/pexels-photo-3394346.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&dpr=2'],
+      stock: 8,
+      categoryId: 'apple',
+      featured: true
+    },
+    {
+      name: 'MacBook Pro 13" M2',
+      description: 'Compact MacBook Pro with M2 chip, perfect for professionals on the go.',
+      price: 1299.99,
+      specs: {
+        processor: 'Apple M2',
+        ram: '8GB Unified Memory',
+        storage: '256GB SSD',
+        display: '13.3-inch Retina',
+        graphics: 'M2 Integrated GPU',
+        battery: 'Up to 20 hours'
+      },
+      images: ['https://images.pexels.com/photos/3394346/pexels-photo-3394346.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&dpr=2'],
+      stock: 15,
+      categoryId: 'apple',
+      featured: false
     }
   ];
 

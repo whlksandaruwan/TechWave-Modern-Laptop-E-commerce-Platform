@@ -1,0 +1,30 @@
+/* Custom animations for the robot chatbot */
+
+@keyframes eye-glow {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(59, 130, 246, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 15px rgba(59, 130, 246, 0.8);
+  }
+}
+
+.eye-glow {
+  animation: eye-glow 2s ease-in-out infinite;
+}
+
+/* Live status indicator */
+.live-indicator {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.1);
+  }
+} 

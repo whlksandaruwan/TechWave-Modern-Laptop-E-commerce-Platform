@@ -40,10 +40,15 @@ const ProductsPage = () => {
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
+  const [activeCategory, setActiveCategory] = useState<string>('all');
 
   useEffect(() => {
     document.title = 'Shop All Laptops - TechWave';
-  }, []);
+    
+    // Set active category based on URL params
+    const categoryParam = searchParams.get('category');
+    setActiveCategory(categoryParam || 'all');
+  }, [searchParams]);
 
   const handleFilterChange = (newFilters: FilterOptions) => {
     setFilters(newFilters);
@@ -73,6 +78,50 @@ const ProductsPage = () => {
           <p className="text-gray-600">
             Discover our complete collection of premium laptops
           </p>
+          
+          {/* Quick Category Filters */}
+          <div className="flex flex-wrap gap-3 mt-6">
+            <button
+              onClick={() => navigate('/products')}
+              className={`px-4 py-2 rounded-lg transition-colors ${
+                activeCategory === 'all' 
+                  ? 'bg-primary-600 text-white' 
+                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+              }`}
+            >
+              All Laptops
+            </button>
+            <button
+              onClick={() => navigate('/products?category=apple')}
+              className={`px-4 py-2 rounded-lg transition-colors ${
+                activeCategory === 'apple' 
+                  ? 'bg-primary-600 text-white' 
+                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+              }`}
+            >
+              MacBooks
+            </button>
+            <button
+              onClick={() => navigate('/products?category=gaming')}
+              className={`px-4 py-2 rounded-lg transition-colors ${
+                activeCategory === 'gaming' 
+                  ? 'bg-primary-600 text-white' 
+                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+              }`}
+            >
+              Gaming
+            </button>
+            <button
+              onClick={() => navigate('/products?category=business')}
+              className={`px-4 py-2 rounded-lg transition-colors ${
+                activeCategory === 'business' 
+                  ? 'bg-primary-600 text-white' 
+                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+              }`}
+            >
+              Business
+            </button>
+          </div>
         </div>
       </div>
 

@@ -5,6 +5,7 @@ import FeaturedProducts from '../components/home/FeaturedProducts';
 import CategorySection from '../components/home/CategorySection';
 import NewProductsBanner from '../components/home/NewProductsBanner';
 import TestimonialsSection from '../components/home/TestimonialsSection';
+import MacBookSection from '../components/home/MacBookSection';
 import CTASection from '../components/home/CTASection';
 
 const HomePage = () => {
@@ -25,6 +26,7 @@ const HomePage = () => {
       <CategorySection />
       <NewProductsBanner />
       <TestimonialsSection />
+      <MacBookSection />
       <CTASection />
     </motion.div>
   );

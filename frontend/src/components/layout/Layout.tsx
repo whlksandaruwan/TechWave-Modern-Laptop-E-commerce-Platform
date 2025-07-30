@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import Header from './Header';
 import Footer from './Footer';
+import Chatbot from '../ui/Chatbot';
 import { motion } from 'framer-motion';
 
 const Layout = () => {
@@ -25,6 +26,7 @@ const Layout = () => {
         <Outlet />
       </motion.main>
       <Footer />
+      <Chatbot />
     </div>
   );
 };

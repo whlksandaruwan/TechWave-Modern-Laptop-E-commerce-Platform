@@ -29,6 +29,12 @@ export class CategoriesController {
         description: 'Powerful machines optimized for video editing, 3D modeling, and design work.',
         slug: 'creator'
       },
+      { 
+        id: 'apple', 
+        name: 'Apple MacBooks',
+        description: 'Premium MacBooks with Apple Silicon for exceptional performance and battery life.',
+        slug: 'apple'
+      },
     ];
   }
 } 
