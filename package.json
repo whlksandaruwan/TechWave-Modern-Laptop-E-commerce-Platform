@@ -1,5 +1,17 @@
 {
-  "dependencies": {
-    "react-player": "^3.3.1"
+  "name": "techwave-laptop-store",
+  "version": "1.0.0",
+  "description": "A modern laptop e-commerce platform",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "cd backend && npm run start:dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "build": "cd frontend && npm run build",
+    "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install",
+    "seed": "cd backend && npm run seed",
+    "start": "cd backend && npm run start:prod"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
   }
 }

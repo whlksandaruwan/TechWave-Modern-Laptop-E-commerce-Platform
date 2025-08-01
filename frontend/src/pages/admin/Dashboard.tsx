@@ -142,32 +142,32 @@ const Dashboard = () => {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-white rounded-xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-shadow"
+      className="bg-white rounded-xl shadow-sm p-4 sm:p-6 border border-gray-100 hover:shadow-md transition-shadow"
     >
       <div className="flex items-center justify-between">
-        <div>
-          <p className="text-sm font-medium text-gray-600">{title}</p>
-          <p className="text-2xl font-bold text-gray-900 mt-1">{value}</p>
+        <div className="min-w-0 flex-1">
+          <p className="text-xs sm:text-sm font-medium text-gray-600 truncate">{title}</p>
+          <p className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 mt-1 truncate">{value}</p>
         </div>
-        <div className={`p-3 rounded-full ${color}`}>
-          <Icon className="w-6 h-6 text-white" />
+        <div className={`p-2 sm:p-3 rounded-full ${color} flex-shrink-0 ml-3`}>
+          <Icon className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-white" />
         </div>
       </div>
-      <div className="flex items-center justify-between mt-4">
-        <div className="flex items-center">
+      <div className="flex items-center justify-between mt-3 sm:mt-4">
+        <div className="flex items-center min-w-0 flex-1">
           {change >= 0 ? (
-            <ArrowUpRight className="w-4 h-4 text-green-500 mr-1" />
+            <ArrowUpRight className="w-3 h-3 sm:w-4 sm:h-4 text-green-500 mr-1 flex-shrink-0" />
           ) : (
-            <ArrowDownRight className="w-4 h-4 text-red-500 mr-1" />
+            <ArrowDownRight className="w-3 h-3 sm:w-4 sm:h-4 text-red-500 mr-1 flex-shrink-0" />
           )}
-          <span className={`text-sm font-medium ${change >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+          <span className={`text-xs sm:text-sm font-medium ${change >= 0 ? 'text-green-600' : 'text-red-600'}`}>
             {Math.abs(change)}%
           </span>
-          <span className="text-sm text-gray-500 ml-1">vs last month</span>
+          <span className="text-xs sm:text-sm text-gray-500 ml-1 hidden sm:inline">vs last month</span>
         </div>
         {link && (
-          <Link to={link} className="text-primary-600 hover:text-primary-700">
-            <Eye className="w-4 h-4" />
+          <Link to={link} className="text-primary-600 hover:text-primary-700 flex-shrink-0 ml-2">
+            <Eye className="w-3 h-3 sm:w-4 sm:h-4" />
           </Link>
         )}
       </div>
@@ -188,27 +188,29 @@ const Dashboard = () => {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.3 }}
-      className="container mx-auto px-4 py-8"
+      className="min-h-screen bg-gray-50"
     >
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-          <p className="text-gray-600 mt-1">Welcome back! Here's what's happening with your store.</p>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        {/* Header Section */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
+          <div className="mb-4 sm:mb-0">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Dashboard</h1>
+            <p className="text-gray-600 mt-1">Welcome back! Here's what's happening with your store.</p>
+          </div>
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center space-y-2 sm:space-y-0 sm:space-x-3">
+            <button className="inline-flex items-center justify-center px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors text-sm">
+              <Calendar className="w-4 h-4 mr-2" />
+              Last 30 days
+            </button>
+            <button className="inline-flex items-center justify-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors text-sm">
+              <BarChart3 className="w-4 h-4 mr-2" />
+              View Reports
+            </button>
+          </div>
         </div>
-        <div className="flex items-center space-x-3">
-          <button className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
-            <Calendar className="w-4 h-4 mr-2" />
-            Last 30 days
-          </button>
-          <button className="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors">
-            <BarChart3 className="w-4 h-4 mr-2" />
-            View Reports
-          </button>
-        </div>
-      </div>
 
-      {/* Stats Grid */}
-      <div className="w-full max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <StatCard
           title="Total Revenue"
           value={formatPrice(stats.totalRevenue)}
@@ -242,157 +244,158 @@ const Dashboard = () => {
         />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Recent Orders */}
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+          {/* Recent Orders */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden"
+          >
+            <div className="p-4 sm:p-6 border-b border-gray-100">
+              <div className="flex items-center justify-between">
+                <h2 className="text-lg font-semibold text-gray-900">Recent Orders</h2>
+                <Link 
+                  to="/admin/orders"
+                  className="text-primary-600 hover:text-primary-700 text-sm font-medium"
+                >
+                  View All
+                </Link>
+              </div>
+            </div>
+            <div className="p-4 sm:p-6">
+              <div className="space-y-3">
+                {recentOrders.map((order) => (
+                  <div key={order.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                    <div className="min-w-0 flex-1">
+                      <p className="font-medium text-gray-900 text-sm truncate">{order.customerName}</p>
+                      <p className="text-xs text-gray-500">Order #{order.id}</p>
+                      <p className="text-xs text-gray-400">{new Date(order.date).toLocaleDateString()}</p>
+                    </div>
+                    <div className="text-right ml-4">
+                      <p className="font-semibold text-gray-900 text-sm">{formatPrice(order.total)}</p>
+                      <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
+                        order.status === 'completed' ? 'bg-green-100 text-green-800' :
+                        order.status === 'processing' ? 'bg-yellow-100 text-yellow-800' :
+                        order.status === 'shipped' ? 'bg-blue-100 text-blue-800' :
+                        'bg-gray-100 text-gray-800'
+                      }`}>
+                        {order.status}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Top Products */}
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden"
+          >
+            <div className="p-4 sm:p-6 border-b border-gray-100">
+              <div className="flex items-center justify-between">
+                <h2 className="text-lg font-semibold text-gray-900">Top Products</h2>
+                <Link 
+                  to="/admin/products"
+                  className="text-primary-600 hover:text-primary-700 text-sm font-medium"
+                >
+                  View All
+                </Link>
+              </div>
+            </div>
+            <div className="p-4 sm:p-6">
+              <div className="space-y-3">
+                {topProducts.map((product, index) => (
+                  <div key={product.id} className="flex items-center justify-between hover:bg-gray-50 p-2 rounded-lg transition-colors">
+                    <div className="flex items-center min-w-0 flex-1">
+                      <div className="w-6 h-6 bg-primary-100 text-primary-600 rounded-full flex items-center justify-center text-xs font-semibold mr-3 flex-shrink-0">
+                        {index + 1}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="font-medium text-gray-900 text-sm truncate">{product.name}</p>
+                        <p className="text-xs text-gray-500">{product.sales} units sold</p>
+                      </div>
+                    </div>
+                    <div className="text-right ml-4 flex-shrink-0">
+                      <p className="font-semibold text-gray-900 text-sm">{formatPrice(product.revenue)}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+        </div>
+
+        {/* Quick Actions */}
         <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          className="bg-white rounded-xl shadow-sm border border-gray-100"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mt-6 bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6"
         >
-          <div className="p-6 border-b border-gray-100">
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-gray-900">Recent Orders</h2>
-              <Link 
-                to="/admin/orders"
-                className="text-primary-600 hover:text-primary-700 text-sm font-medium"
-              >
-                View All
-              </Link>
-            </div>
-          </div>
-          <div className="p-6">
-            <div className="space-y-4">
-              {recentOrders.map((order) => (
-                <div key={order.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                  <div>
-                    <p className="font-medium text-gray-900">{order.customerName}</p>
-                    <p className="text-sm text-gray-500">Order #{order.id}</p>
-                    <p className="text-xs text-gray-400">{new Date(order.date).toLocaleDateString()}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-semibold text-gray-900">{formatPrice(order.total)}</p>
-                    <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
-                      order.status === 'completed' ? 'bg-green-100 text-green-800' :
-                      order.status === 'processing' ? 'bg-yellow-100 text-yellow-800' :
-                      order.status === 'shipped' ? 'bg-blue-100 text-blue-800' :
-                      'bg-gray-100 text-gray-800'
-                    }`}>
-                      {order.status}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+            <Link 
+              to="/admin/products/new"
+              className="flex items-center justify-center p-3 sm:p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-primary-300 hover:bg-primary-50 transition-colors group"
+            >
+              <Package className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 group-hover:text-primary-600 mr-2" />
+              <span className="text-gray-600 group-hover:text-primary-600 font-medium text-sm sm:text-base">Add New Product</span>
+            </Link>
+            <Link 
+              to="/admin/orders"
+              className="flex items-center justify-center p-3 sm:p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-primary-300 hover:bg-primary-50 transition-colors group"
+            >
+              <Eye className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 group-hover:text-primary-600 mr-2" />
+              <span className="text-gray-600 group-hover:text-primary-600 font-medium text-sm sm:text-base">View Orders</span>
+            </Link>
+            <Link 
+              to="/admin/customers"
+              className="flex items-center justify-center p-3 sm:p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-primary-300 hover:bg-primary-50 transition-colors group"
+            >
+              <Users className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 group-hover:text-primary-600 mr-2" />
+              <span className="text-gray-600 group-hover:text-primary-600 font-medium text-sm sm:text-base">Manage Customers</span>
+            </Link>
+            <button className="flex items-center justify-center p-3 sm:p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-primary-300 hover:bg-primary-50 transition-colors group">
+              <PieChart className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 group-hover:text-primary-600 mr-2" />
+              <span className="text-gray-600 group-hover:text-primary-600 font-medium text-sm sm:text-base">Analytics</span>
+            </button>
           </div>
         </motion.div>
 
-        {/* Top Products */}
+        {/* System Status */}
         <motion.div
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          className="bg-white rounded-xl shadow-sm border border-gray-100"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mt-6 bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6"
         >
-          <div className="p-6 border-b border-gray-100">
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-gray-900">Top Products</h2>
-              <Link 
-                to="/admin/products"
-                className="text-primary-600 hover:text-primary-700 text-sm font-medium"
-              >
-                View All
-              </Link>
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">System Status</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            <div className="flex items-center">
+              <div className="w-3 h-3 bg-green-500 rounded-full mr-3 flex-shrink-0"></div>
+              <div>
+                <p className="font-medium text-gray-900 text-sm sm:text-base">Database</p>
+                <p className="text-xs sm:text-sm text-gray-500">Operational</p>
+              </div>
             </div>
-          </div>
-          <div className="p-6">
-            <div className="space-y-4">
-              {topProducts.map((product, index) => (
-                <div key={product.id} className="flex items-center justify-between hover:bg-gray-50 p-2 rounded-lg transition-colors">
-                  <div className="flex items-center">
-                    <div className="w-8 h-8 bg-primary-100 text-primary-600 rounded-full flex items-center justify-center text-sm font-semibold mr-3">
-                      {index + 1}
-                    </div>
-                    <div>
-                      <p className="font-medium text-gray-900 text-sm">{product.name}</p>
-                      <p className="text-xs text-gray-500">{product.sales} units sold</p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-semibold text-gray-900 text-sm">{formatPrice(product.revenue)}</p>
-                  </div>
-                </div>
-              ))}
+            <div className="flex items-center">
+              <div className="w-3 h-3 bg-green-500 rounded-full mr-3 flex-shrink-0"></div>
+              <div>
+                <p className="font-medium text-gray-900 text-sm sm:text-base">API Services</p>
+                <p className="text-xs sm:text-sm text-gray-500">All systems running</p>
+              </div>
+            </div>
+            <div className="flex items-center">
+              <div className="w-3 h-3 bg-yellow-500 rounded-full mr-3 flex-shrink-0"></div>
+              <div>
+                <p className="font-medium text-gray-900 text-sm sm:text-base">Payment Gateway</p>
+                <p className="text-xs sm:text-sm text-gray-500">Minor delays</p>
+              </div>
             </div>
           </div>
         </motion.div>
       </div>
-
-      {/* Quick Actions */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="mt-8 bg-white rounded-xl shadow-sm border border-gray-100 p-6"
-      >
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h2>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <Link 
-            to="/admin/products/new"
-            className="flex items-center justify-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-primary-300 hover:bg-primary-50 transition-colors group"
-          >
-            <Package className="w-5 h-5 text-gray-400 group-hover:text-primary-600 mr-2" />
-            <span className="text-gray-600 group-hover:text-primary-600 font-medium">Add New Product</span>
-          </Link>
-          <Link 
-            to="/admin/orders"
-            className="flex items-center justify-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-primary-300 hover:bg-primary-50 transition-colors group"
-          >
-            <Eye className="w-5 h-5 text-gray-400 group-hover:text-primary-600 mr-2" />
-            <span className="text-gray-600 group-hover:text-primary-600 font-medium">View Orders</span>
-          </Link>
-          <Link 
-            to="/admin/customers"
-            className="flex items-center justify-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-primary-300 hover:bg-primary-50 transition-colors group"
-          >
-            <Users className="w-5 h-5 text-gray-400 group-hover:text-primary-600 mr-2" />
-            <span className="text-gray-600 group-hover:text-primary-600 font-medium">Manage Customers</span>
-          </Link>
-          <button className="flex items-center justify-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-primary-300 hover:bg-primary-50 transition-colors group">
-            <PieChart className="w-5 h-5 text-gray-400 group-hover:text-primary-600 mr-2" />
-            <span className="text-gray-600 group-hover:text-primary-600 font-medium">Analytics</span>
-          </button>
-        </div>
-      </motion.div>
-
-      {/* System Status */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="mt-8 bg-white rounded-xl shadow-sm border border-gray-100 p-6"
-      >
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">System Status</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="flex items-center">
-            <div className="w-3 h-3 bg-green-500 rounded-full mr-3"></div>
-            <div>
-              <p className="font-medium text-gray-900">Database</p>
-              <p className="text-sm text-gray-500">Operational</p>
-            </div>
-          </div>
-          <div className="flex items-center">
-            <div className="w-3 h-3 bg-green-500 rounded-full mr-3"></div>
-            <div>
-              <p className="font-medium text-gray-900">API Services</p>
-              <p className="text-sm text-gray-500">All systems running</p>
-            </div>
-          </div>
-          <div className="flex items-center">
-            <div className="w-3 h-3 bg-yellow-500 rounded-full mr-3"></div>
-            <div>
-              <p className="font-medium text-gray-900">Payment Gateway</p>
-              <p className="text-sm text-gray-500">Minor delays</p>
-            </div>
-          </div>
-        </div>
-      </motion.div>
     </motion.div>
   );
 };
