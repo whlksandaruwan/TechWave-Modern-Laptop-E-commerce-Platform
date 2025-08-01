@@ -9,7 +9,13 @@ import {
   MessageSquare,
   Headphones,
   Shield,
-  CheckCircle
+  CheckCircle,
+  Sparkles,
+  Zap,
+  Users,
+  ArrowRight,
+  Star,
+  Globe
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -56,27 +62,31 @@ const ContactPage = () => {
   const contactInfo = [
     {
       icon: Phone,
-      title: 'Phone',
+      title: 'Call Us',
       details: '+1 (555) 123-4567',
-      description: 'Mon-Fri 9AM-6PM PST'
+      description: 'Mon-Fri 9AM-6PM PST',
+      gradient: 'from-tech-primary to-primary-500'
     },
     {
       icon: Mail,
-      title: 'Email',
+      title: 'Email Us',
       details: 'support@techwave.com',
-      description: 'We reply within 24 hours'
+      description: 'We reply within 24 hours',
+      gradient: 'from-tech-secondary to-purple-500'
     },
     {
       icon: MapPin,
-      title: 'Address',
+      title: 'Visit Us',
       details: '1234 Innovation Way, San Francisco, CA 94107',
-      description: 'Visit our showroom'
+      description: 'Visit our showroom',
+      gradient: 'from-accent-500 to-orange-500'
     },
     {
       icon: Clock,
       title: 'Business Hours',
       details: 'Mon-Fri: 9AM-6PM PST',
-      description: 'Sat-Sun: 10AM-4PM PST'
+      description: 'Sat-Sun: 10AM-4PM PST',
+      gradient: 'from-secondary-500 to-primary-500'
     }
   ];
 
@@ -86,21 +96,21 @@ const ContactPage = () => {
       title: 'Live Chat',
       description: 'Get instant help from our support team',
       action: 'Start Chat',
-      color: 'bg-blue-500'
+      gradient: 'from-emerald-500 to-teal-500'
     },
     {
       icon: Headphones,
       title: 'Phone Support',
       description: 'Speak directly with our experts',
       action: 'Call Now',
-      color: 'bg-green-500'
+      gradient: 'from-violet-500 to-purple-500'
     },
     {
       icon: Shield,
       title: 'Technical Support',
       description: 'Get help with setup and troubleshooting',
       action: 'Get Help',
-      color: 'bg-purple-500'
+      gradient: 'from-orange-500 to-red-500'
     }
   ];
 
@@ -112,42 +122,163 @@ const ContactPage = () => {
       transition={{ duration: 0.3 }}
       className="pt-16 md:pt-20"
     >
-      {/* Hero Section */}
-      <section className="bg-gradient-to-br from-primary-900 via-primary-800 to-primary-900 text-white py-20">
-        <div className="container mx-auto px-4">
+      {/* Hero Section - Different Style */}
+      <section className="relative min-h-screen bg-gradient-to-br from-tech-dark via-primary-900 to-tech-dark overflow-hidden">
+        {/* Different Animated background */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute top-0 left-0 w-full h-full">
+            <motion.div
+              animate={{
+                scale: [1, 1.2, 1],
+                rotate: [0, 180, 360],
+              }}
+              transition={{
+                duration: 15,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
+              className="w-full h-full bg-gradient-to-br from-tech-primary/30 to-primary-500/30 rounded-full"
+            />
+          </div>
+          <div className="absolute bottom-0 right-0 w-full h-full">
+            <motion.div
+              animate={{
+                scale: [1.2, 1, 1.2],
+                rotate: [360, 180, 0],
+              }}
+              transition={{
+                duration: 20,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
+              className="w-full h-full bg-gradient-to-br from-primary-500/20 to-tech-primary/20 rounded-full"
+            />
+          </div>
+        </div>
+
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-32 min-h-screen flex items-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="text-center max-w-3xl mx-auto"
+            transition={{ duration: 0.8 }}
+            className="text-center max-w-4xl mx-auto"
           >
-            <h1 className="text-4xl md:text-5xl font-bold mb-6">
-              Get in Touch
-            </h1>
-            <p className="text-xl text-primary-100 mb-8">
-              Have questions about our laptops or need help choosing the perfect one? 
-              We're here to help you every step of the way.
-            </p>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-tech-primary to-primary-500 rounded-full mb-8 shadow-2xl"
+            >
+              <MessageSquare className="w-10 h-10 text-white" />
+            </motion.div>
+            <motion.h1
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.4 }}
+              className="text-4xl md:text-6xl font-bold text-white mb-6"
+            >
+              Let's Start a
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-cyan-400">
+                {" "}Conversation
+              </span>
+            </motion.h1>
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.6 }}
+              className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto"
+            >
+              Ready to find your perfect laptop? Our team is here to help you make the right choice.
+            </motion.p>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.8 }}
+              className="flex flex-wrap justify-center gap-4"
+            >
+              {[
+                { icon: Star, text: "Expert Advice" },
+                { icon: Shield, text: "Secure Support" },
+                { icon: Globe, text: "24/7 Available" }
+              ].map((item, index) => (
+                <div key={index} className="flex items-center space-x-2 text-gray-300">
+                  <item.icon className="w-4 h-4 text-tech-primary" />
+                  <span className="text-sm">{item.text}</span>
+                </div>
+              ))}
+            </motion.div>
           </motion.div>
         </div>
       </section>
 
-      {/* Contact Form and Info */}
-      <section className="py-20">
+      {/* Contact Form and Info - Different Layout */}
+      <section className="py-20 bg-gradient-to-b from-tech-dark to-black">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-            {/* Contact Form */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white">
+              Get in
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-tech-primary to-primary-400">
+                {" "}Touch
+              </span>
+            </h2>
+            <p className="text-gray-300 max-w-2xl mx-auto">
+              Choose your preferred way to reach us. We're here to help you find the perfect laptop.
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Contact Information - Left Side */}
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6 }}
-              className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100"
+              className="lg:col-span-1 space-y-6"
             >
-              <h2 className="text-2xl font-bold mb-6">Send us a Message</h2>
+              {contactInfo.map((info, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  className="bg-white/5 backdrop-blur-md rounded-xl p-6 border border-white/10 hover:bg-white/10 transition-all duration-300 group"
+                >
+                  <div className="flex items-start space-x-4">
+                    <div className={`flex-shrink-0 w-12 h-12 bg-gradient-to-r ${info.gradient} text-white rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+                      <info.icon className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-white mb-1">{info.title}</h3>
+                      <p className="text-gray-200 font-medium">{info.details}</p>
+                      <p className="text-gray-400 text-sm">{info.description}</p>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </motion.div>
+
+            {/* Contact Form - Center */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="lg:col-span-2 bg-gradient-to-br from-purple-500/10 to-cyan-500/10 backdrop-blur-md rounded-2xl shadow-2xl p-8 border border-purple-500/20"
+            >
+              <div className="flex items-center mb-6">
+                <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-cyan-500 rounded-full flex items-center justify-center mr-4">
+                  <Send className="w-5 h-5 text-white" />
+                </div>
+                <h2 className="text-2xl font-bold text-white">Send us a Message</h2>
+              </div>
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-2">
                       Full Name *
                     </label>
                     <input
@@ -157,12 +288,12 @@ const ContactPage = () => {
                       required
                       value={formData.name}
                       onChange={handleChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                      className="w-full px-4 py-3 bg-white/10 border border-purple-500/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-white placeholder-gray-400 backdrop-blur-sm"
                       placeholder="John Doe"
                     />
                   </div>
                   <div>
-                    <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
                       Email Address *
                     </label>
                     <input
@@ -172,14 +303,14 @@ const ContactPage = () => {
                       required
                       value={formData.email}
                       onChange={handleChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                      className="w-full px-4 py-3 bg-white/10 border border-purple-500/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-white placeholder-gray-400 backdrop-blur-sm"
                       placeholder="john@example.com"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="category" className="block text-sm font-medium text-gray-300 mb-2">
                     Category
                   </label>
                   <select
@@ -187,7 +318,7 @@ const ContactPage = () => {
                     name="category"
                     value={formData.category}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    className="w-full px-4 py-3 bg-white/10 border border-purple-500/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-white backdrop-blur-sm"
                   >
                     <option value="general">General Inquiry</option>
                     <option value="sales">Sales Question</option>
@@ -198,7 +329,7 @@ const ContactPage = () => {
                 </div>
 
                 <div>
-                  <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="subject" className="block text-sm font-medium text-gray-300 mb-2">
                     Subject *
                   </label>
                   <input
@@ -208,13 +339,13 @@ const ContactPage = () => {
                     required
                     value={formData.subject}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    className="w-full px-4 py-3 bg-white/10 border border-purple-500/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-white placeholder-gray-400 backdrop-blur-sm"
                     placeholder="How can we help you?"
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="message" className="block text-sm font-medium text-gray-300 mb-2">
                     Message *
                   </label>
                   <textarea
@@ -224,7 +355,7 @@ const ContactPage = () => {
                     rows={6}
                     value={formData.message}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
+                    className="w-full px-4 py-3 bg-white/10 border border-purple-500/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-white placeholder-gray-400 backdrop-blur-sm resize-none"
                     placeholder="Tell us more about your inquiry..."
                   />
                 </div>
@@ -232,7 +363,7 @@ const ContactPage = () => {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full bg-primary-600 hover:bg-primary-700 text-white font-medium py-3 px-6 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                  className="w-full bg-gradient-to-r from-purple-500 to-cyan-500 hover:from-purple-600 hover:to-cyan-600 text-white font-medium py-3 px-6 rounded-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center transform hover:scale-105"
                 >
                   {isSubmitting ? (
                     <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
@@ -243,63 +374,60 @@ const ContactPage = () => {
                 </button>
               </form>
             </motion.div>
-
-            {/* Contact Information */}
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6 }}
-              className="space-y-8"
-            >
-              <div>
-                <h2 className="text-2xl font-bold mb-6">Contact Information</h2>
-                <div className="space-y-6">
-                  {contactInfo.map((info, index) => (
-                    <div key={index} className="flex items-start space-x-4">
-                      <div className="flex-shrink-0 w-12 h-12 bg-primary-100 text-primary-600 rounded-lg flex items-center justify-center">
-                        <info.icon className="w-6 h-6" />
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-gray-900 mb-1">{info.title}</h3>
-                        <p className="text-gray-800 font-medium">{info.details}</p>
-                        <p className="text-gray-600 text-sm">{info.description}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Support Options */}
-              <div>
-                <h3 className="text-xl font-bold mb-4">Need Immediate Help?</h3>
-                <div className="space-y-4">
-                  {supportOptions.map((option, index) => (
-                    <div key={index} className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-4">
-                          <div className={`w-10 h-10 ${option.color} rounded-lg flex items-center justify-center`}>
-                            <option.icon className="w-5 h-5 text-white" />
-                          </div>
-                          <div>
-                            <h4 className="font-semibold text-gray-900">{option.title}</h4>
-                            <p className="text-gray-600 text-sm">{option.description}</p>
-                          </div>
-                        </div>
-                        <button className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium transition-colors">
-                          {option.action}
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </motion.div>
           </div>
         </div>
       </section>
 
-      {/* FAQ Section */}
-      <section className="py-20 bg-gray-50">
+      {/* Support Options - Different Style */}
+      <section className="py-20 bg-gradient-to-b from-black to-slate-900">
+        <div className="container mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-3xl font-bold mb-4 text-white">
+              Need
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-tech-primary to-primary-400">
+                {" "}Immediate Help?
+              </span>
+            </h2>
+            <p className="text-gray-300 max-w-2xl mx-auto">
+              Get instant support through our various channels. We're here 24/7 to assist you.
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {supportOptions.map((option, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                className="bg-gradient-to-br from-purple-500/10 to-cyan-500/10 backdrop-blur-md rounded-2xl p-8 border border-purple-500/20 hover:border-purple-500/40 transition-all duration-300 group"
+              >
+                <div className="text-center">
+                  <div className={`inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r ${option.gradient} rounded-2xl mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+                    <option.icon className="w-8 h-8 text-white" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-white mb-3">{option.title}</h3>
+                  <p className="text-gray-300 mb-6">{option.description}</p>
+                  <button className="px-6 py-3 bg-gradient-to-r from-purple-500 to-cyan-500 hover:from-purple-600 hover:to-cyan-600 text-white rounded-lg font-medium transition-all duration-300 transform hover:scale-105 flex items-center justify-center mx-auto">
+                    <span>{option.action}</span>
+                    <ArrowRight className="w-4 h-4 ml-2" />
+                  </button>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ Section - Different Style */}
+      <section className="py-20 bg-gradient-to-b from-slate-900 to-black">
         <div className="container mx-auto px-4">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -308,13 +436,18 @@ const ContactPage = () => {
             transition={{ duration: 0.6 }}
             className="text-center mb-12"
           >
-            <h2 className="text-3xl font-bold mb-4">Frequently Asked Questions</h2>
-            <p className="text-gray-600 max-w-2xl mx-auto">
-              Find quick answers to common questions about our products and services.
+            <h2 className="text-3xl font-bold mb-4 text-white">
+              Common
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-tech-primary to-primary-400">
+                {" "}Questions
+              </span>
+            </h2>
+            <p className="text-gray-300 max-w-2xl mx-auto">
+              Quick answers to the most frequently asked questions about our services.
             </p>
           </motion.div>
 
-          <div className="max-w-3xl mx-auto space-y-4">
+          <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
             {[
               {
                 question: "What's your return policy?",
@@ -335,6 +468,10 @@ const ContactPage = () => {
               {
                 question: "Can I customize my laptop?",
                 answer: "Many of our laptops offer customization options for RAM, storage, and other components. Contact us for specific models."
+              },
+              {
+                question: "What payment methods do you accept?",
+                answer: "We accept all major credit cards, PayPal, and bank transfers. We also offer financing options for qualified customers."
               }
             ].map((faq, index) => (
               <motion.div
@@ -343,17 +480,19 @@ const ContactPage = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="bg-white rounded-lg shadow-sm border border-gray-100"
+                className="bg-gradient-to-br from-purple-500/10 to-cyan-500/10 backdrop-blur-md rounded-xl border border-purple-500/20 hover:border-purple-500/40 transition-all duration-300"
               >
                 <details className="group">
                   <summary className="flex items-center justify-between p-6 cursor-pointer">
-                    <h3 className="font-semibold text-gray-900">{faq.question}</h3>
+                    <h3 className="font-semibold text-white pr-4">{faq.question}</h3>
                     <div className="ml-4 flex-shrink-0">
-                      <CheckCircle className="w-5 h-5 text-primary-600 group-open:rotate-45 transition-transform" />
+                      <div className="w-6 h-6 bg-gradient-to-r from-purple-500 to-cyan-500 rounded-full flex items-center justify-center group-open:rotate-45 transition-transform duration-300">
+                        <CheckCircle className="w-3 h-3 text-white" />
+                      </div>
                     </div>
                   </summary>
                   <div className="px-6 pb-6">
-                    <p className="text-gray-600">{faq.answer}</p>
+                    <p className="text-gray-300">{faq.answer}</p>
                   </div>
                 </details>
               </motion.div>
@@ -362,8 +501,8 @@ const ContactPage = () => {
         </div>
       </section>
 
-      {/* Map Section */}
-      <section className="py-20">
+      {/* Map Section - Different Style */}
+      <section className="py-20 bg-gradient-to-b from-black to-slate-900">
         <div className="container mx-auto px-4">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -372,18 +511,30 @@ const ContactPage = () => {
             transition={{ duration: 0.6 }}
             className="text-center mb-12"
           >
-            <h2 className="text-3xl font-bold mb-4">Visit Our Showroom</h2>
-            <p className="text-gray-600 max-w-2xl mx-auto">
-              Come see our laptops in person at our San Francisco showroom. 
+            <h2 className="text-3xl font-bold mb-4 text-white">
+              Visit Our
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-tech-primary to-primary-400">
+                {" "}Showroom
+              </span>
+            </h2>
+            <p className="text-gray-300 max-w-2xl mx-auto">
+              Experience our laptops in person at our San Francisco showroom. 
               Our experts are ready to help you find the perfect device.
             </p>
           </motion.div>
 
-          <div className="bg-gray-200 rounded-2xl h-96 flex items-center justify-center">
+          <div className="bg-gradient-to-br from-purple-500/10 to-cyan-500/10 backdrop-blur-md rounded-2xl h-96 flex items-center justify-center border border-purple-500/20">
             <div className="text-center">
-              <MapPin className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-600 font-medium">Interactive Map</p>
-              <p className="text-gray-500 text-sm">1234 Innovation Way, San Francisco, CA 94107</p>
+              <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-cyan-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+                <MapPin className="w-8 h-8 text-white" />
+              </div>
+              <p className="text-white font-medium text-lg mb-2">Interactive Map</p>
+              <p className="text-gray-400">1234 Innovation Way, San Francisco, CA 94107</p>
+              <div className="mt-6">
+                <button className="px-6 py-3 bg-gradient-to-r from-purple-500 to-cyan-500 hover:from-purple-600 hover:to-cyan-600 text-white rounded-lg font-medium transition-all duration-300 transform hover:scale-105">
+                  Get Directions
+                </button>
+              </div>
             </div>
           </div>
         </div>

@@ -281,22 +281,7 @@ const MacBookSection = () => {
           ))}
         </div>
 
-        {/* CTA Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-          viewport={{ once: true }}
-          className="text-center"
-        >
-          <Link
-            to="/products?category=apple"
-            className="inline-flex items-center space-x-2 bg-primary-600 text-white px-8 py-4 rounded-lg hover:bg-primary-700 transition-colors font-medium text-lg"
-          >
-            <span>Explore All MacBooks</span>
-            <ArrowRight className="w-5 h-5" />
-          </Link>
-        </motion.div>
+
       </div>
     </section>
   );
