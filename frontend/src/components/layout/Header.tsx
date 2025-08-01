@@ -21,6 +21,10 @@ const Header = () => {
   const location = useLocation();
 
   const isAdminPage = location.pathname.startsWith('/admin');
+  
+  // Check if current page has dark theme
+  const isDarkPage = ['/', '/about', '/contact', '/products'].includes(location.pathname) || 
+                     location.pathname.startsWith('/products/');
 
   // Check if page is scrolled
   useEffect(() => {
@@ -180,84 +184,184 @@ const Header = () => {
     );
   };
 
+  // Determine header background and text colors based on page and scroll state
+  const getHeaderClasses = () => {
+    if (isAdminPage) {
+      return {
+        header: 'bg-primary-900 text-white',
+        navLink: 'text-white hover:text-primary-200',
+        activeNavLink: 'text-primary-300',
+        icon: 'text-white',
+        hoverBg: 'hover:bg-primary-800'
+      };
+    }
+
+    if (isScrolled) {
+      if (isDarkPage) {
+        return {
+          header: 'bg-gradient-to-r from-gray-900/95 via-blue-900/20 to-purple-900/20 backdrop-blur-sm shadow-lg border-b border-white/10',
+          navLink: 'text-white hover:text-blue-400 transition-colors duration-200',
+          activeNavLink: 'text-blue-400 font-semibold',
+          icon: 'text-white',
+          hoverBg: 'hover:bg-white/10 rounded-lg transition-all duration-200'
+        };
+      } else {
+        return {
+          header: 'bg-white/95 backdrop-blur-sm shadow-md border-b border-gray-200',
+          navLink: 'text-gray-700 hover:text-blue-600 transition-colors duration-200',
+          activeNavLink: 'text-blue-600 font-semibold',
+          icon: 'text-gray-600',
+          hoverBg: 'hover:bg-blue-50 rounded-lg transition-all duration-200'
+        };
+      }
+    } else {
+      // Not scrolled
+      if (isDarkPage) {
+        return {
+          header: 'bg-gradient-to-r from-gray-800/90 via-blue-900/30 to-purple-900/30 backdrop-blur-sm border-b border-white/5',
+          navLink: 'text-white hover:text-blue-400 transition-colors duration-200',
+          activeNavLink: 'text-blue-400 font-semibold',
+          icon: 'text-white',
+          hoverBg: 'hover:bg-white/10 rounded-lg transition-all duration-200'
+        };
+      } else {
+        return {
+          header: 'bg-gradient-to-r from-white/80 via-blue-50/50 to-purple-50/50 backdrop-blur-sm border-b border-gray-200/50',
+          navLink: 'text-gray-700 hover:text-blue-600 transition-colors duration-200',
+          activeNavLink: 'text-blue-600 font-semibold',
+          icon: 'text-gray-600',
+          hoverBg: 'hover:bg-blue-50 rounded-lg transition-all duration-200'
+        };
+      }
+    }
+  };
+
+  const headerClasses = getHeaderClasses();
+
   return (
     <header 
       className={cn(
         'fixed top-0 left-0 right-0 z-50 transition-all duration-300',
-        isScrolled ? 'bg-white/90 backdrop-blur-sm shadow-md' : 'bg-transparent',
-        isAdminPage ? 'bg-primary-900 text-white' : '',
+        headerClasses.header,
         'w-full'
       )}
     >
       <div className="w-full px-2 sm:px-4 md:px-6 lg:px-8">
         <div className="flex items-center justify-between h-14 md:h-16">
-          {/* Logo */}
+          {/* Enhanced Logo */}
           <Link 
             to="/" 
-            className="flex items-center space-x-2"
+            className="flex items-center space-x-3 group"
           >
-            <Laptop className="w-8 h-8 text-primary-600" />
-            <span className="text-xl font-bold tracking-tight">
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-500 via-purple-500 to-cyan-500 rounded-lg blur-sm opacity-75 group-hover:opacity-100 transition-opacity duration-300"></div>
+              <Laptop className={cn(
+                "relative w-8 h-8 z-10",
+                isAdminPage ? "text-white" : 
+                isDarkPage ? "text-white" : "text-white"
+              )} />
+            </div>
+            <span className={cn(
+              "text-xl font-bold tracking-tight bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent",
+              isAdminPage ? "from-blue-300 via-purple-300 to-cyan-300" : 
+              isDarkPage ? "from-blue-300 via-purple-300 to-cyan-300" : "from-blue-600 via-purple-600 to-cyan-600"
+            )}>
               {isAdminPage ? 'TechWave Admin' : 'TechWave'}
             </span>
           </Link>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
+          {/* Enhanced Desktop Navigation */}
+          <nav className="hidden md:flex items-center space-x-1">
             <NavLink 
               to="/" 
               className={({ isActive }) => cn(
-                'font-medium transition-colors hover:text-primary-600',
-                isActive ? 'text-primary-600' : 'text-gray-700',
-                isAdminPage && 'text-white hover:text-primary-200'
+                'px-4 py-2 rounded-lg font-medium transition-all duration-200 relative overflow-hidden',
+                isActive 
+                  ? 'bg-gradient-to-r from-blue-500/20 to-purple-500/20 text-blue-400 shadow-lg' 
+                  : headerClasses.navLink
               )}
               end
             >
-              Home
+              {({ isActive }) => (
+                <>
+                  {isActive && (
+                    <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-lg" />
+                  )}
+                  <span className="relative z-10">Home</span>
+                </>
+              )}
             </NavLink>
             {!isAdminPage && (
               <NavLink 
                 to="/products" 
                 className={({ isActive }) => cn(
-                  'font-medium transition-colors hover:text-primary-600',
-                  isActive ? 'text-primary-600' : 'text-gray-700'
+                  'px-4 py-2 rounded-lg font-medium transition-all duration-200 relative overflow-hidden',
+                  isActive 
+                    ? 'bg-gradient-to-r from-blue-500/20 to-purple-500/20 text-blue-400 shadow-lg' 
+                    : headerClasses.navLink
                 )}
               >
-                Products
+                {({ isActive }) => (
+                  <>
+                    {isActive && (
+                      <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-lg" />
+                    )}
+                    <span className="relative z-10">Products</span>
+                  </>
+                )}
               </NavLink>
             )}
             {!isAdminPage && (
               <NavLink 
                 to="/about" 
                 className={({ isActive }) => cn(
-                  'font-medium transition-colors hover:text-primary-600',
-                  isActive ? 'text-primary-600' : 'text-gray-700'
+                  'px-4 py-2 rounded-lg font-medium transition-all duration-200 relative overflow-hidden',
+                  isActive 
+                    ? 'bg-gradient-to-r from-blue-500/20 to-purple-500/20 text-blue-400 shadow-lg' 
+                    : headerClasses.navLink
                 )}
               >
-                About
+                {({ isActive }) => (
+                  <>
+                    {isActive && (
+                      <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-lg" />
+                    )}
+                    <span className="relative z-10">About</span>
+                  </>
+                )}
               </NavLink>
             )}
             {!isAdminPage && (
               <NavLink 
                 to="/contact" 
                 className={({ isActive }) => cn(
-                  'font-medium transition-colors hover:text-primary-600',
-                  isActive ? 'text-primary-600' : 'text-gray-700'
+                  'px-4 py-2 rounded-lg font-medium transition-all duration-200 relative overflow-hidden',
+                  isActive 
+                    ? 'bg-gradient-to-r from-blue-500/20 to-purple-500/20 text-blue-400 shadow-lg' 
+                    : headerClasses.navLink
                 )}
               >
-                Contact
+                {({ isActive }) => (
+                  <>
+                    {isActive && (
+                      <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-lg" />
+                    )}
+                    <span className="relative z-10">Contact</span>
+                  </>
+                )}
               </NavLink>
             )}
             {isAuthenticated && isAdminPage && renderAdminNavLinks()}
           </nav>
 
-          {/* Right Side Icons */}
-          <div className="flex items-center space-x-4">
+          {/* Enhanced Right Side Icons */}
+          <div className="flex items-center space-x-2">
             <button
               onClick={() => setIsSearchOpen(true)}
               className={cn(
-                'p-2 rounded-full transition-colors',
-                isAdminPage ? 'hover:bg-primary-800' : 'hover:bg-gray-100'
+                'p-2 rounded-lg transition-all duration-200 hover:scale-105',
+                headerClasses.hoverBg,
+                headerClasses.icon
               )}
               aria-label="Search"
             >
@@ -267,12 +371,16 @@ const Header = () => {
             {!isAdminPage && (
               <Link 
                 to="/wishlist" 
-                className="p-2 rounded-full hover:bg-gray-100 transition-colors relative"
+                className={cn(
+                  "p-2 rounded-lg transition-all duration-200 hover:scale-105 relative",
+                  headerClasses.hoverBg,
+                  headerClasses.icon
+                )}
                 aria-label="Wishlist"
               >
                 <Heart className="w-5 h-5" />
                 {wishlistItemsCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                  <span className="absolute -top-1 -right-1 bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center shadow-lg">
                     {wishlistItemsCount > 9 ? '9+' : wishlistItemsCount}
                   </span>
                 )}
@@ -282,12 +390,16 @@ const Header = () => {
             {!isAdminPage && (
               <Link 
                 to="/cart" 
-                className="p-2 rounded-full hover:bg-gray-100 transition-colors relative"
+                className={cn(
+                  "p-2 rounded-lg transition-all duration-200 hover:scale-105 relative",
+                  headerClasses.hoverBg,
+                  headerClasses.icon
+                )}
                 aria-label="Cart"
               >
                 <ShoppingCart className="w-5 h-5" />
                 {cartItemsCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-accent-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                  <span className="absolute -top-1 -right-1 bg-gradient-to-r from-blue-500 to-purple-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center shadow-lg">
                     {cartItemsCount > 9 ? '9+' : cartItemsCount}
                   </span>
                 )}
@@ -298,46 +410,51 @@ const Header = () => {
               <div className="relative group">
                 <button 
                   className={cn(
-                    'flex items-center space-x-1 p-1.5 rounded-full hover:bg-gray-100 transition-colors',
-                    isAdminPage && 'hover:bg-primary-800'
+                    'flex items-center space-x-2 p-2 rounded-full transition-colors',
+                    headerClasses.hoverBg,
+                    headerClasses.icon
                   )}
-                  aria-label="User menu"
                 >
-                  {user?.avatar ? (
-                    <img 
-                      src={user.avatar} 
-                      alt={user.name} 
-                      className="w-6 h-6 rounded-full"
-                    />
-                  ) : (
-                    <User className="w-5 h-5" />
-                  )}
+                  <User className="w-5 h-5" />
                 </button>
                 {renderUserMenu()}
               </div>
             ) : (
-              <Link 
-                to="/login" 
-                className={cn(
-                  'flex items-center space-x-1 p-1.5 rounded-full hover:bg-gray-100 transition-colors',
-                  isAdminPage && 'hover:bg-primary-800'
-                )}
-              >
-                <User className="w-5 h-5" />
-              </Link>
+              <div className="flex items-center space-x-2">
+                <Link
+                  to="/login"
+                  className={cn(
+                    'px-4 py-2 text-sm font-medium transition-colors',
+                    isDarkPage 
+                      ? 'text-white hover:text-blue-400' 
+                      : 'text-gray-700 hover:text-blue-600'
+                  )}
+                >
+                  Sign In
+                </Link>
+                <Link
+                  to="/register"
+                  className={cn(
+                    'px-4 py-2 text-sm font-medium bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:opacity-90 transition-all duration-200',
+                    isDarkPage && 'shadow-lg'
+                  )}
+                >
+                  Sign Up
+                </Link>
+              </div>
             )}
 
             {/* Mobile Menu Button */}
             <button
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="md:hidden p-2 rounded-full transition-colors hover:bg-gray-100"
-              aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
-            >
-              {isMobileMenuOpen ? (
-                <X className="w-5 h-5" />
-              ) : (
-                <Menu className="w-5 h-5" />
+              onClick={() => setIsMobileMenuOpen(true)}
+              className={cn(
+                'md:hidden p-2 rounded-full transition-colors',
+                headerClasses.hoverBg,
+                headerClasses.icon
               )}
+              aria-label="Open menu"
+            >
+              <Menu className="w-5 h-5" />
             </button>
           </div>
         </div>
@@ -347,176 +464,133 @@ const Header = () => {
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.2 }}
-            className="md:hidden bg-white border-t"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black bg-opacity-50 z-50 md:hidden"
+            onClick={() => setIsMobileMenuOpen(false)}
           >
-            <nav className="flex flex-col space-y-4 px-4 py-6">
-              <NavLink 
-                to="/" 
-                className={({ isActive }) => cn(
-                  'px-4 py-2 rounded-md font-medium',
-                  isActive ? 'bg-primary-50 text-primary-600' : 'text-gray-700'
-                )}
-                onClick={() => setIsMobileMenuOpen(false)}
-                end
-              >
-                Home
-              </NavLink>
-              <NavLink 
-                to="/products" 
-                className={({ isActive }) => cn(
-                  'px-4 py-2 rounded-md font-medium',
-                  isActive ? 'bg-primary-50 text-primary-600' : 'text-gray-700'
-                )}
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                Products
-              </NavLink>
-              <NavLink 
-                to="/about" 
-                className={({ isActive }) => cn(
-                  'px-4 py-2 rounded-md font-medium',
-                  isActive ? 'bg-primary-50 text-primary-600' : 'text-gray-700'
-                )}
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                About
-              </NavLink>
-              <NavLink 
-                to="/contact" 
-                className={({ isActive }) => cn(
-                  'px-4 py-2 rounded-md font-medium',
-                  isActive ? 'bg-primary-50 text-primary-600' : 'text-gray-700'
-                )}
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                Contact
-              </NavLink>
-              {isAuthenticated && user?.isAdmin && (
-                <>
+            <motion.div
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ ease: "easeInOut", duration: 0.3 }}
+              className="fixed right-0 top-0 bottom-0 w-full max-w-xs bg-white shadow-xl overflow-y-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between p-4 border-b">
+                <h2 className="text-lg font-medium">Menu</h2>
+                <button
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="p-2 -mr-2 text-gray-500 hover:text-gray-700"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <nav className="p-4 space-y-4">
+                <NavLink 
+                  to="/" 
+                  className={({ isActive }) => cn(
+                    'block py-2 font-medium transition-colors',
+                    isActive ? 'text-primary-600' : 'text-gray-700 hover:text-primary-600'
+                  )}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  end
+                >
+                  Home
+                </NavLink>
+                {!isAdminPage && (
                   <NavLink 
-                    to="/admin" 
+                    to="/products" 
                     className={({ isActive }) => cn(
-                      'px-4 py-2 rounded-md font-medium',
-                      isActive ? 'bg-primary-50 text-primary-600' : 'text-gray-700'
-                    )}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    end
-                  >
-                    Admin Dashboard
-                  </NavLink>
-                  <NavLink 
-                    to="/admin/products" 
-                    className={({ isActive }) => cn(
-                      'px-4 py-2 rounded-md font-medium',
-                      isActive ? 'bg-primary-50 text-primary-600' : 'text-gray-700'
+                      'block py-2 font-medium transition-colors',
+                      isActive ? 'text-primary-600' : 'text-gray-700 hover:text-primary-600'
                     )}
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
-                    Manage Products
+                    Products
                   </NavLink>
-                </>
-              )}
-              {!isAuthenticated ? (
-                <div className="flex flex-col space-y-2 pt-4 border-t">
-                  <Link 
-                    to="/login" 
-                    className="w-full px-4 py-2 bg-primary-600 text-white rounded-md text-center font-medium"
+                )}
+                {!isAdminPage && (
+                  <NavLink 
+                    to="/about" 
+                    className={({ isActive }) => cn(
+                      'block py-2 font-medium transition-colors',
+                      isActive ? 'text-primary-600' : 'text-gray-700 hover:text-primary-600'
+                    )}
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
-                    Sign In
-                  </Link>
-                  <Link 
-                    to="/register" 
-                    className="w-full px-4 py-2 bg-white border border-gray-300 rounded-md text-center font-medium"
+                    About
+                  </NavLink>
+                )}
+                {!isAdminPage && (
+                  <NavLink 
+                    to="/contact" 
+                    className={({ isActive }) => cn(
+                      'block py-2 font-medium transition-colors',
+                      isActive ? 'text-primary-600' : 'text-gray-700 hover:text-primary-600'
+                    )}
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
-                    Register
-                  </Link>
-                </div>
-              ) : (
-                <div className="flex flex-col space-y-2 pt-4 border-t">
-                  <Link 
-                    to="/profile" 
-                    className="px-4 py-2 rounded-md font-medium text-gray-700"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    Profile
-                  </Link>
-                  <button
-                    onClick={() => {
-                      logout();
-                      setIsMobileMenuOpen(false);
-                    }}
-                    className="px-4 py-2 rounded-md font-medium text-red-600 text-left"
-                  >
-                    Sign out
-                  </button>
-                </div>
-              )}
-            </nav>
+                    Contact
+                  </NavLink>
+                )}
+                {isAuthenticated && isAdminPage && (
+                  <div className="pt-4 border-t">
+                    {renderAdminNavLinks()}
+                  </div>
+                )}
+              </nav>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Search Overlay */}
+      {/* Search Modal */}
       <AnimatePresence>
         {isSearchOpen && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 z-50 flex items-start justify-center pt-20"
+            className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
             onClick={() => setIsSearchOpen(false)}
           >
             <motion.div
-              initial={{ y: -20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: -20, opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className="bg-white rounded-xl shadow-xl w-full max-w-2xl mx-4"
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white rounded-lg max-w-md w-full p-6"
               onClick={(e) => e.stopPropagation()}
             >
-              <form onSubmit={handleSearchSubmit} className="p-4">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-medium">Search</h2>
+                <button
+                  onClick={() => setIsSearchOpen(false)}
+                  className="p-2 -mr-2 text-gray-500 hover:text-gray-700"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              <form onSubmit={handleSearchSubmit} className="space-y-4">
+                <div>
                   <input
                     type="text"
-                    placeholder="Search for laptops, brands, or categories..."
-                    className="w-full pl-10 pr-4 py-3 border-0 rounded-lg bg-gray-100 focus:bg-white focus:ring-2 focus:ring-primary-500 outline-none transition-all"
+                    placeholder="Search products..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                     autoFocus
                   />
-                  <button 
-                    type="button" 
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                    onClick={() => setIsSearchOpen(false)}
-                  >
-                    <X className="w-5 h-5" />
-                  </button>
                 </div>
+                <button
+                  type="submit"
+                  className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white py-2 px-4 rounded-lg hover:opacity-90 transition-all duration-200"
+                >
+                  Search
+                </button>
               </form>
-              <div className="px-4 pb-4">
-                <h3 className="font-medium text-sm text-gray-500 mb-2">Popular Searches</h3>
-                <div className="flex flex-wrap gap-2">
-                  {['Gaming Laptop', 'MacBook Pro', 'Budget Laptop', 'Ultrabook', 'RTX Graphics'].map((term) => (
-                    <button
-                      key={term}
-                      className="px-3 py-1 bg-gray-100 rounded-full text-sm hover:bg-gray-200 transition-colors"
-                      onClick={() => {
-                        setSearchQuery(term);
-                        // You could also immediately submit the search here
-                      }}
-                    >
-                      {term}
-                    </button>
-                  ))}
-                </div>
-              </div>
             </motion.div>
           </motion.div>
         )}

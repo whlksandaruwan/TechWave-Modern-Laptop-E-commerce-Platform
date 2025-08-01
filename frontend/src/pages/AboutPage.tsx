@@ -92,7 +92,7 @@ const AboutPage = () => {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.3 }}
-      className="pt-16 md:pt-20"
+      className=""
     >
       {/* Hero Section */}
       <section className="relative min-h-screen bg-gradient-to-b from-gray-900 to-black overflow-hidden">

@@ -120,7 +120,7 @@ const ContactPage = () => {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.3 }}
-      className="pt-16 md:pt-20"
+      className=""
     >
       {/* Hero Section - Different Style */}
       <section className="relative min-h-screen bg-gradient-to-br from-tech-dark via-primary-900 to-tech-dark overflow-hidden">

@@ -14,13 +14,15 @@ export class OrdersService {
   ) {}
 
   async createOrder(orderData: any, user: User): Promise<Order> {
-    const order = this.ordersRepository.create({
+    const order = new Order();
+    Object.assign(order, {
       ...orderData,
       user,
       orderNumber: this.generateOrderNumber(),
     });
 
-    return await this.ordersRepository.save(order);
+    const savedOrder = await this.ordersRepository.save(order);
+    return savedOrder;
   }
 
   async getOrders(userId?: string): Promise<Order[]> {

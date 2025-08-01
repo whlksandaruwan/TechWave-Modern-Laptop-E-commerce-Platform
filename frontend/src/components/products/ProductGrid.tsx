@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Link, useSearchParams, useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Heart, ShoppingCart } from 'lucide-react';
+import { Heart, ShoppingCart, Eye, GitCompare, Star } from 'lucide-react';
 import { formatPrice } from '../../lib/utils';
 import { useCartStore } from '../../store/cartStore';
 import { useWishlistStore } from '../../store/wishlistStore';
@@ -12,6 +12,12 @@ import { toast } from 'sonner';
 interface ProductGridProps {
   filters?: FilterOptions;
   searchQuery?: string;
+  sortBy?: 'name' | 'price' | 'rating' | 'newest' | 'popular';
+  sortOrder?: 'asc' | 'desc';
+  viewMode?: 'grid' | 'list';
+  onQuickView?: (product: Laptop) => void;
+  onCompareToggle?: (productId: string) => void;
+  compareProducts?: string[];
 }
 
 interface Laptop {
@@ -35,7 +41,16 @@ interface Laptop {
   updatedAt: Date;
 }
 
-const ProductGrid = ({ filters, searchQuery }: ProductGridProps) => {
+const ProductGrid = ({ 
+  filters, 
+  searchQuery = '', 
+  sortBy = 'newest',
+  sortOrder = 'desc',
+  viewMode = 'grid',
+  onQuickView,
+  onCompareToggle,
+  compareProducts = []
+}: ProductGridProps) => {
   const [products, setProducts] = useState<Laptop[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -121,6 +136,52 @@ const ProductGrid = ({ filters, searchQuery }: ProductGridProps) => {
     fetchProducts();
   }, [filters, searchQuery, searchParams]);
 
+  // Sort products based on sortBy and sortOrder
+  const sortedProducts = useMemo(() => {
+    const sorted = [...products];
+    
+    switch (sortBy) {
+      case 'name':
+        sorted.sort((a, b) => {
+          const result = a.name.localeCompare(b.name);
+          return sortOrder === 'asc' ? result : -result;
+        });
+        break;
+      case 'price':
+        sorted.sort((a, b) => {
+          const result = a.price - b.price;
+          return sortOrder === 'asc' ? result : -result;
+        });
+        break;
+      case 'rating':
+        // Mock rating for demo - in real app this would come from API
+        sorted.sort((a, b) => {
+          const ratingA = Math.floor(Math.random() * 2) + 4; // 4-5 stars
+          const ratingB = Math.floor(Math.random() * 2) + 4;
+          const result = ratingA - ratingB;
+          return sortOrder === 'asc' ? result : -result;
+        });
+        break;
+      case 'newest':
+        sorted.sort((a, b) => {
+          const dateA = new Date(a.createdAt).getTime();
+          const dateB = new Date(b.createdAt).getTime();
+          const result = dateA - dateB;
+          return sortOrder === 'asc' ? result : -result;
+        });
+        break;
+      case 'popular':
+        // Mock popularity based on stock (lower stock = more popular)
+        sorted.sort((a, b) => {
+          const result = a.stock - b.stock;
+          return sortOrder === 'asc' ? result : -result;
+        });
+        break;
+    }
+    
+    return sorted;
+  }, [products, sortBy, sortOrder]);
+
   const handleAddToCart = (e: React.MouseEvent, product: Laptop) => {
     e.preventDefault();
     addItem(product.id, 1);
@@ -147,22 +208,36 @@ const ProductGrid = ({ filters, searchQuery }: ProductGridProps) => {
     }
   };
 
+  const handleQuickView = (e: React.MouseEvent, product: Laptop) => {
+    e.preventDefault();
+    if (onQuickView) {
+      onQuickView(product);
+    }
+  };
+
+  const handleCompareToggle = (e: React.MouseEvent, product: Laptop) => {
+    e.preventDefault();
+    if (onCompareToggle) {
+      onCompareToggle(product.id);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center py-16">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="text-center py-16 text-red-500">
+      <div className="text-center py-16 text-red-400">
         <h3 className="text-xl font-medium mb-2">Error Loading Products</h3>
         <p className="mb-4">{error}</p>
         <button 
           onClick={() => window.location.reload()}
-          className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
+          className="px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:opacity-90 transition-all duration-200"
         >
           Retry
         </button>
@@ -170,14 +245,16 @@ const ProductGrid = ({ filters, searchQuery }: ProductGridProps) => {
     );
   }
 
-  if (products.length === 0) {
+  if (sortedProducts.length === 0) {
     return (
       <div className="text-center py-16">
-        <h3 className="text-xl font-medium mb-2">No products found</h3>
-        <p className="text-gray-600 mb-6">Try changing your filters or search query.</p>
+        <h3 className="text-xl font-medium mb-2 text-white">No products found</h3>
+        <p className="text-gray-400 mb-6">
+          {searchQuery ? `No products match "${searchQuery}"` : 'Try changing your filters or search query.'}
+        </p>
         <Link
           to="/products"
-          className="inline-flex items-center justify-center px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg transition-colors"
+          className="inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 hover:opacity-90 text-white font-medium rounded-lg transition-all duration-200"
         >
           View All Products
         </Link>
@@ -185,89 +262,142 @@ const ProductGrid = ({ filters, searchQuery }: ProductGridProps) => {
     );
   }
 
-  return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-      {products.map((product, index) => (
-        <motion.div
-          key={product.id}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: index * 0.05 }}
+  const ProductCard = ({ product, index }: { product: Laptop; index: number }) => {
+    const isInCompare = compareProducts.includes(product.id);
+    const mockRating = Math.floor(Math.random() * 2) + 4; // 4-5 stars for demo
+
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: index * 0.05 }}
+        className={`group block bg-gray-800 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 relative border border-gray-700 ${
+          viewMode === 'list' ? 'flex' : ''
+        }`}
+      >
+        <Link
+          to={`/products/${product.id}`}
+          className={`block ${viewMode === 'list' ? 'flex flex-1' : ''}`}
         >
-          <Link
-            to={`/products/${product.id}`}
-            className="group block bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow relative"
-          >
-            {/* Product image */}
-            <div className="aspect-square overflow-hidden bg-gray-100">
-              <img
-                src={product.images[0] || 'https://images.pexels.com/photos/7974/pexels-photo.jpg?auto=compress&cs=tinysrgb&w=400&h=400&dpr=2'}
-                alt={product.name}
-                className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
-              />
-            </div>
+          {/* Product image */}
+          <div className={`overflow-hidden bg-gray-700 ${viewMode === 'list' ? 'w-48 h-48' : 'aspect-square'}`}>
+            <img
+              src={product.images[0] || 'https://images.pexels.com/photos/7974/pexels-photo.jpg?auto=compress&cs=tinysrgb&w=400&h=400&dpr=2'}
+              alt={product.name}
+              className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
+            />
+          </div>
 
-            {/* Quick action buttons */}
-            <div className="absolute top-4 right-4 flex flex-col space-y-2">
+          {/* Quick action buttons */}
+          <div className="absolute top-4 right-4 flex flex-col space-y-2">
+            <button
+              onClick={(e) => handleToggleWishlist(e, product)}
+              className="p-2 bg-gray-800/90 backdrop-blur-sm rounded-full shadow-sm hover:bg-gray-700 transition-colors border border-gray-600"
+              aria-label={isInWishlist(product.id) ? "Remove from wishlist" : "Add to wishlist"}
+            >
+              <Heart className={`w-5 h-5 ${isInWishlist(product.id) ? "fill-red-500 text-red-500" : "text-gray-300"}`} />
+            </button>
+            <button
+              onClick={(e) => handleAddToCart(e, product)}
+              className="p-2 bg-gray-800/90 backdrop-blur-sm rounded-full shadow-sm hover:bg-gray-700 transition-colors border border-gray-600"
+              aria-label="Add to cart"
+            >
+              <ShoppingCart className="w-5 h-5 text-gray-300" />
+            </button>
+            {onQuickView && (
               <button
-                onClick={(e) => handleToggleWishlist(e, product)}
-                className="p-2 bg-white/90 backdrop-blur-sm rounded-full shadow-sm hover:bg-white transition-colors"
-                aria-label={isInWishlist(product.id) ? "Remove from wishlist" : "Add to wishlist"}
+                onClick={(e) => handleQuickView(e, product)}
+                className="p-2 bg-gray-800/90 backdrop-blur-sm rounded-full shadow-sm hover:bg-gray-700 transition-colors border border-gray-600"
+                aria-label="Quick view"
               >
-                <Heart className={`w-5 h-5 ${isInWishlist(product.id) ? "fill-red-500 text-red-500" : "text-gray-600"}`} />
+                <Eye className="w-5 h-5 text-gray-300" />
               </button>
-              <button
-                onClick={(e) => handleAddToCart(e, product)}
-                className="p-2 bg-white/90 backdrop-blur-sm rounded-full shadow-sm hover:bg-white transition-colors"
-                aria-label="Add to cart"
-              >
-                <ShoppingCart className="w-5 h-5 text-gray-600" />
-              </button>
-            </div>
-
-            {/* Stock status */}
-            {product.stock < 5 && product.stock > 0 && (
-              <div className="absolute top-4 left-4 bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded">
-                Only {product.stock} left
-              </div>
             )}
+            {onCompareToggle && (
+              <button
+                onClick={(e) => handleCompareToggle(e, product)}
+                className={`p-2 backdrop-blur-sm rounded-full shadow-sm transition-colors border ${
+                  isInCompare 
+                    ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white border-blue-500' 
+                    : 'bg-gray-800/90 text-gray-300 hover:bg-gray-700 border-gray-600'
+                }`}
+                aria-label={isInCompare ? "Remove from compare" : "Add to compare"}
+              >
+                <GitCompare className="w-5 h-5" />
+              </button>
+            )}
+          </div>
+
+          {/* Stock status */}
+          {product.stock < 5 && product.stock > 0 && (
+            <div className="absolute top-4 left-4 bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded">
+              Only {product.stock} left
+            </div>
+          )}
+          
+          {product.stock === 0 && (
+            <div className="absolute top-4 left-4 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">
+              Out of Stock
+            </div>
+          )}
+
+          {/* Product info */}
+          <div className={`p-6 ${viewMode === 'list' ? 'flex-1' : ''}`}>
+            <div className="flex items-start justify-between mb-2">
+              <div className="text-sm text-blue-400 font-medium capitalize">{product.categoryId}</div>
+              {viewMode === 'list' && (
+                <div className="flex items-center">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <Star
+                      key={i}
+                      className={`w-4 h-4 ${i < mockRating ? 'text-yellow-400 fill-current' : 'text-gray-600'}`}
+                    />
+                  ))}
+                  <span className="ml-1 text-sm text-gray-400">({mockRating})</span>
+                </div>
+              )}
+            </div>
             
-            {product.stock === 0 && (
-              <div className="absolute top-4 left-4 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">
-                Out of Stock
+            <h3 className="font-semibold text-lg mb-2 group-hover:text-blue-400 transition-colors text-white">
+              {product.name}
+            </h3>
+            <p className="text-gray-300 text-sm mb-4 line-clamp-2">
+              {product.description}
+            </p>
+            
+            {/* Key specs */}
+            <div className="text-xs text-gray-400 mb-3 space-y-1">
+              <div>💻 {product.specs.processor}</div>
+              <div>🧠 {product.specs.ram}</div>
+              <div>💾 {product.specs.storage}</div>
+              {viewMode === 'list' && (
+                <>
+                  <div>🖥️ {product.specs.display}</div>
+                  <div>🎮 {product.specs.graphics}</div>
+                </>
+              )}
+            </div>
+            
+            <div className="flex items-end justify-between">
+              <div>
+                <span className="font-bold text-lg text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">
+                  {formatPrice(product.price)}
+                </span>
               </div>
-            )}
-
-            {/* Product info */}
-            <div className="p-6">
-              <div className="text-sm text-primary-600 font-medium mb-2 capitalize">{product.categoryId}</div>
-              <h3 className="font-semibold text-lg mb-2 group-hover:text-primary-600 transition-colors">
-                {product.name}
-              </h3>
-              <p className="text-gray-600 text-sm mb-4 line-clamp-2">
-                {product.description}
-              </p>
-              
-              {/* Key specs */}
-              <div className="text-xs text-gray-500 mb-3 space-y-1">
-                <div>💻 {product.specs.processor}</div>
-                <div>🧠 {product.specs.ram}</div>
-                <div>💾 {product.specs.storage}</div>
-              </div>
-              
-              <div className="flex items-end justify-between">
-                <div>
-                  <span className="font-bold text-lg">
-                    {formatPrice(product.price)}
-                  </span>
-                </div>
-                <div className="text-xs text-gray-500">
-                  {product.stock > 0 ? `${product.stock} in stock` : 'Out of stock'}
-                </div>
+              <div className="text-xs text-gray-400">
+                {product.stock > 0 ? `${product.stock} in stock` : 'Out of stock'}
               </div>
             </div>
-          </Link>
-        </motion.div>
+          </div>
+        </Link>
+      </motion.div>
+    );
+  };
+
+  return (
+    <div className={viewMode === 'list' ? 'space-y-4' : 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6'}>
+      {sortedProducts.map((product, index) => (
+        <ProductCard key={product.id} product={product} index={index} />
       ))}
     </div>
   );
