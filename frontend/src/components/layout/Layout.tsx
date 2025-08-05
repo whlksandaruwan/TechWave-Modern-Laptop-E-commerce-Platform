@@ -7,6 +7,7 @@ import { motion } from 'framer-motion';
 
 const Layout = () => {
   const location = useLocation();
+  const isAdminPage = location.pathname.startsWith('/admin');
 
   // Scroll to top on route change
   useEffect(() => {
@@ -17,7 +18,7 @@ const Layout = () => {
     <div className="flex flex-col min-h-screen">
       <Header />
       <motion.main 
-        className="flex-grow"
+        className={isAdminPage ? "flex-grow pt-16" : "flex-grow pt-16"}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}

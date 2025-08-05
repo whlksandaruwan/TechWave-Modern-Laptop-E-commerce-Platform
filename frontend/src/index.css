@@ -1,3 +1,17 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Ensure proper text spacing for navigation links */
+.nav-link {
+  white-space: normal;
+  word-spacing: normal;
+  letter-spacing: normal;
+}
+
+/* Specific fix for admin navigation */
+.admin-nav-link {
+  white-space: normal !important;
+  word-spacing: normal !important;
+  letter-spacing: normal !important;
+}

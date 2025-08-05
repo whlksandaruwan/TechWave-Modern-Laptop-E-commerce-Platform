@@ -58,11 +58,11 @@ const Header = () => {
 
     if (user.role === 'admin') {
       return (
-        <>
+        <div className="flex items-center space-x-1">
           <NavLink 
             to="/admin" 
             className={({ isActive }) => cn(
-              'font-medium transition-colors',
+              'font-medium transition-colors px-4 py-2 rounded-lg',
               isActive ? 'text-primary-300' : 'text-white',
               'hover:text-primary-200'
             )}
@@ -73,7 +73,7 @@ const Header = () => {
           <NavLink 
             to="/admin/products" 
             className={({ isActive }) => cn(
-              'font-medium transition-colors',
+              'font-medium transition-colors admin-nav-link px-4 py-2 rounded-lg',
               isActive ? 'text-primary-300' : 'text-white',
               'hover:text-primary-200'
             )}
@@ -83,7 +83,7 @@ const Header = () => {
           <NavLink 
             to="/admin/orders" 
             className={({ isActive }) => cn(
-              'font-medium transition-colors',
+              'font-medium transition-colors px-4 py-2 rounded-lg',
               isActive ? 'text-primary-300' : 'text-white',
               'hover:text-primary-200'
             )}
@@ -93,24 +93,24 @@ const Header = () => {
           <NavLink 
             to="/admin/customers" 
             className={({ isActive }) => cn(
-              'font-medium transition-colors',
+              'font-medium transition-colors px-4 py-2 rounded-lg',
               isActive ? 'text-primary-300' : 'text-white',
               'hover:text-primary-200'
             )}
           >
             Customers
           </NavLink>
-        </>
+        </div>
       );
     }
 
     if (user.role === 'manager') {
       return (
-        <>
+        <div className="flex items-center space-x-1">
           <NavLink 
             to="/admin/products" 
             className={({ isActive }) => cn(
-              'font-medium transition-colors',
+              'font-medium transition-colors admin-nav-link px-4 py-2 rounded-lg',
               isActive ? 'text-primary-300' : 'text-white',
               'hover:text-primary-200'
             )}
@@ -120,14 +120,14 @@ const Header = () => {
           <NavLink 
             to="/admin/orders" 
             className={({ isActive }) => cn(
-              'font-medium transition-colors',
+              'font-medium transition-colors px-4 py-2 rounded-lg',
               isActive ? 'text-primary-300' : 'text-white',
               'hover:text-primary-200'
             )}
           >
             Orders
           </NavLink>
-        </>
+        </div>
       );
     }
 
