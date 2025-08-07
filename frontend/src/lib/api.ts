@@ -118,12 +118,6 @@ const mockLaptops = [
 
 // Enhanced API functions with fallback to mock data
 export const getLaptops = async () => {
-  // If we're not on localhost, use mock data directly
-  if (!isLocalhostAvailable()) {
-    console.log('Not on localhost, using mock data');
-    return mockLaptops;
-  }
-
   try {
     const response = await api.get('/laptops');
     return response.data;
@@ -134,12 +128,6 @@ export const getLaptops = async () => {
 };
 
 export const getLaptop = async (id: string) => {
-  // If we're not on localhost, use mock data directly
-  if (!isLocalhostAvailable()) {
-    console.log('Not on localhost, using mock data');
-    return mockLaptops.find(laptop => laptop.id === id) || null;
-  }
-
   try {
     const response = await api.get(`/laptops/${id}`);
     return response.data;
@@ -150,12 +138,6 @@ export const getLaptop = async (id: string) => {
 };
 
 export const getFeaturedLaptops = async () => {
-  // If we're not on localhost, use mock data directly
-  if (!isLocalhostAvailable()) {
-    console.log('Not on localhost, using mock featured data');
-    return mockLaptops.filter(laptop => laptop.featured);
-  }
-
   try {
     const response = await api.get('/laptops/featured');
     return response.data;
@@ -166,18 +148,6 @@ export const getFeaturedLaptops = async () => {
 };
 
 export const getCategories = async () => {
-  // If we're not on localhost, use mock data directly
-  if (!isLocalhostAvailable()) {
-    console.log('Not on localhost, using mock categories');
-    return [
-      { id: 'apple', name: 'Apple', description: 'MacBooks and Macs' },
-      { id: 'gaming', name: 'Gaming', description: 'Gaming laptops' },
-      { id: 'creator', name: 'Creator', description: 'Professional creator laptops' },
-      { id: 'business', name: 'Business', description: 'Business laptops' },
-      { id: 'ultrabook', name: 'Ultrabook', description: 'Ultra-portable laptops' }
-    ];
-  }
-
   try {
     const response = await api.get('/categories');
     return response.data;
@@ -195,10 +165,6 @@ export const getCategories = async () => {
 
 // Authentication functions
 export const login = async (email: string, password: string) => {
-  if (!isLocalhostAvailable()) {
-    throw new Error('Login not available in demo mode');
-  }
-
   try {
     const response = await api.post('/auth/login', { email, password });
     return response.data;
@@ -208,10 +174,6 @@ export const login = async (email: string, password: string) => {
 };
 
 export const register = async (userData: any) => {
-  if (!isLocalhostAvailable()) {
-    throw new Error('Registration not available in demo mode');
-  }
-
   try {
     const response = await api.post('/auth/register', userData);
     return response.data;
@@ -221,10 +183,6 @@ export const register = async (userData: any) => {
 };
 
 export const getCurrentUser = async () => {
-  if (!isLocalhostAvailable()) {
-    throw new Error('User authentication not available in demo mode');
-  }
-
   try {
     const response = await api.get('/auth/me');
     return response.data;
@@ -235,11 +193,6 @@ export const getCurrentUser = async () => {
 
 // Cart functions
 export const getCart = async () => {
-  if (!isLocalhostAvailable()) {
-    console.log('Not on localhost, using empty cart');
-    return { items: [], totalAmount: 0 };
-  }
-
   try {
     const response = await api.get('/cart');
     return response.data;
@@ -250,10 +203,6 @@ export const getCart = async () => {
 };
 
 export const addToCart = async (productId: string, quantity: number) => {
-  if (!isLocalhostAvailable()) {
-    throw new Error('Cart functionality not available in demo mode');
-  }
-
   try {
     const response = await api.post('/cart/items', { productId, quantity });
     return response.data;
@@ -263,10 +212,6 @@ export const addToCart = async (productId: string, quantity: number) => {
 };
 
 export const removeFromCart = async (itemId: string) => {
-  if (!isLocalhostAvailable()) {
-    throw new Error('Cart functionality not available in demo mode');
-  }
-
   try {
     const response = await api.delete(`/cart/items/${itemId}`);
     return response.data;
@@ -276,10 +221,6 @@ export const removeFromCart = async (itemId: string) => {
 };
 
 export const updateCartItem = async (itemId: string, quantity: number) => {
-  if (!isLocalhostAvailable()) {
-    throw new Error('Cart functionality not available in demo mode');
-  }
-
   try {
     const response = await api.patch(`/cart/items/${itemId}`, { quantity });
     return response.data;
@@ -290,11 +231,6 @@ export const updateCartItem = async (itemId: string, quantity: number) => {
 
 // Wishlist functions
 export const getWishlist = async () => {
-  if (!isLocalhostAvailable()) {
-    console.log('Not on localhost, using empty wishlist');
-    return [];
-  }
-
   try {
     const response = await api.get('/wishlist');
     return response.data;
@@ -305,10 +241,6 @@ export const getWishlist = async () => {
 };
 
 export const addToWishlist = async (productId: string) => {
-  if (!isLocalhostAvailable()) {
-    throw new Error('Wishlist functionality not available in demo mode');
-  }
-
   try {
     const response = await api.post(`/wishlist/${productId}`);
     return response.data;
@@ -318,10 +250,6 @@ export const addToWishlist = async (productId: string) => {
 };
 
 export const removeFromWishlist = async (productId: string) => {
-  if (!isLocalhostAvailable()) {
-    throw new Error('Wishlist functionality not available in demo mode');
-  }
-
   try {
     const response = await api.delete(`/wishlist/${productId}`);
     return response.data;
@@ -332,11 +260,6 @@ export const removeFromWishlist = async (productId: string) => {
 
 // Orders functions
 export const getOrders = async () => {
-  if (!isLocalhostAvailable()) {
-    console.log('Not on localhost, using empty orders');
-    return [];
-  }
-
   try {
     const response = await api.get('/orders');
     return response.data;
@@ -347,10 +270,6 @@ export const getOrders = async () => {
 };
 
 export const createOrder = async (orderData: any) => {
-  if (!isLocalhostAvailable()) {
-    throw new Error('Order functionality not available in demo mode');
-  }
-
   try {
     const response = await api.post('/orders', orderData);
     return response.data;
@@ -360,10 +279,6 @@ export const createOrder = async (orderData: any) => {
 };
 
 export const getOrderById = async (id: string) => {
-  if (!isLocalhostAvailable()) {
-    throw new Error('Order functionality not available in demo mode');
-  }
-
   try {
     const response = await api.get(`/orders/${id}`);
     return response.data;
@@ -374,10 +289,6 @@ export const getOrderById = async (id: string) => {
 
 // Admin functions
 export const deleteLaptop = async (id: string) => {
-  if (!isLocalhostAvailable()) {
-    throw new Error('Admin functionality not available in demo mode');
-  }
-
   try {
     const response = await api.delete(`/laptops/${id}`);
     return response.data;
@@ -387,10 +298,6 @@ export const deleteLaptop = async (id: string) => {
 };
 
 export const createLaptop = async (laptopData: any) => {
-  if (!isLocalhostAvailable()) {
-    throw new Error('Admin functionality not available in demo mode');
-  }
-
   try {
     const response = await api.post('/laptops', laptopData);
     return response.data;
@@ -400,10 +307,6 @@ export const createLaptop = async (laptopData: any) => {
 };
 
 export const updateLaptop = async (id: string, laptopData: any) => {
-  if (!isLocalhostAvailable()) {
-    throw new Error('Admin functionality not available in demo mode');
-  }
-
   try {
     const response = await api.put(`/laptops/${id}`, laptopData);
     return response.data;
