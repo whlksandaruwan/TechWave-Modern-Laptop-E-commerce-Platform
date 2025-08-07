@@ -196,15 +196,54 @@ const Header = () => {
       };
     }
 
+    // Get current page path for specific styling
+    const currentPath = location.pathname;
+    
     if (isScrolled) {
       if (isDarkPage) {
-        return {
-          header: 'bg-gradient-to-r from-gray-900/95 via-blue-900/20 to-purple-900/20 backdrop-blur-sm shadow-lg border-b border-white/10',
-          navLink: 'text-white hover:text-blue-400 transition-colors duration-200',
-          activeNavLink: 'text-blue-400 font-semibold',
-          icon: 'text-white',
-          hoverBg: 'hover:bg-white/10 rounded-lg transition-all duration-200'
-        };
+        // Different header styles based on specific pages
+        if (currentPath === '/') {
+          return {
+            header: 'bg-gradient-to-r from-gray-900/98 via-gray-800/98 to-gray-900/98 backdrop-blur-sm shadow-lg border-b border-white/10',
+            navLink: 'text-white hover:text-blue-400 transition-colors duration-200',
+            activeNavLink: 'text-blue-400 font-semibold',
+            icon: 'text-white',
+            hoverBg: 'hover:bg-white/10 rounded-lg transition-all duration-200'
+          };
+        } else if (currentPath === '/about') {
+          return {
+            header: 'bg-gradient-to-r from-gray-900/98 via-slate-800/98 to-gray-900/98 backdrop-blur-sm shadow-lg border-b border-white/10',
+            navLink: 'text-white hover:text-purple-400 transition-colors duration-200',
+            activeNavLink: 'text-purple-400 font-semibold',
+            icon: 'text-white',
+            hoverBg: 'hover:bg-white/10 rounded-lg transition-all duration-200'
+          };
+        } else if (currentPath === '/contact') {
+          return {
+            header: 'bg-gradient-to-r from-gray-900/98 via-blue-800/98 to-gray-900/98 backdrop-blur-sm shadow-lg border-b border-white/10',
+            navLink: 'text-white hover:text-cyan-400 transition-colors duration-200',
+            activeNavLink: 'text-cyan-400 font-semibold',
+            icon: 'text-white',
+            hoverBg: 'hover:bg-white/10 rounded-lg transition-all duration-200'
+          };
+        } else if (currentPath.startsWith('/products')) {
+          return {
+            header: 'bg-gradient-to-r from-gray-900/98 via-indigo-800/98 to-gray-900/98 backdrop-blur-sm shadow-lg border-b border-white/10',
+            navLink: 'text-white hover:text-indigo-400 transition-colors duration-200',
+            activeNavLink: 'text-indigo-400 font-semibold',
+            icon: 'text-white',
+            hoverBg: 'hover:bg-white/10 rounded-lg transition-all duration-200'
+          };
+        } else {
+          // Default dark page style
+          return {
+            header: 'bg-gradient-to-r from-gray-900/98 via-gray-800/98 to-gray-900/98 backdrop-blur-sm shadow-lg border-b border-white/10',
+            navLink: 'text-white hover:text-blue-400 transition-colors duration-200',
+            activeNavLink: 'text-blue-400 font-semibold',
+            icon: 'text-white',
+            hoverBg: 'hover:bg-white/10 rounded-lg transition-all duration-200'
+          };
+        }
       } else {
         return {
           header: 'bg-white/95 backdrop-blur-sm shadow-md border-b border-gray-200',
@@ -217,13 +256,49 @@ const Header = () => {
     } else {
       // Not scrolled
       if (isDarkPage) {
-        return {
-          header: 'bg-gradient-to-r from-gray-800/90 via-blue-900/30 to-purple-900/30 backdrop-blur-sm border-b border-white/5',
-          navLink: 'text-white hover:text-blue-400 transition-colors duration-200',
-          activeNavLink: 'text-blue-400 font-semibold',
-          icon: 'text-white',
-          hoverBg: 'hover:bg-white/10 rounded-lg transition-all duration-200'
-        };
+        // Different header styles based on specific pages
+        if (currentPath === '/') {
+          return {
+            header: 'bg-gradient-to-r from-gray-900/95 via-gray-800/95 to-gray-900/95 backdrop-blur-sm border-b border-white/10',
+            navLink: 'text-white hover:text-blue-400 transition-colors duration-200',
+            activeNavLink: 'text-blue-400 font-semibold',
+            icon: 'text-white',
+            hoverBg: 'hover:bg-white/10 rounded-lg transition-all duration-200'
+          };
+        } else if (currentPath === '/about') {
+          return {
+            header: 'bg-gradient-to-r from-gray-900/95 via-slate-800/95 to-gray-900/95 backdrop-blur-sm border-b border-white/10',
+            navLink: 'text-white hover:text-purple-400 transition-colors duration-200',
+            activeNavLink: 'text-purple-400 font-semibold',
+            icon: 'text-white',
+            hoverBg: 'hover:bg-white/10 rounded-lg transition-all duration-200'
+          };
+        } else if (currentPath === '/contact') {
+          return {
+            header: 'bg-gradient-to-r from-gray-900/95 via-blue-800/95 to-gray-900/95 backdrop-blur-sm border-b border-white/10',
+            navLink: 'text-white hover:text-cyan-400 transition-colors duration-200',
+            activeNavLink: 'text-cyan-400 font-semibold',
+            icon: 'text-white',
+            hoverBg: 'hover:bg-white/10 rounded-lg transition-all duration-200'
+          };
+        } else if (currentPath.startsWith('/products')) {
+          return {
+            header: 'bg-gradient-to-r from-gray-900/95 via-indigo-800/95 to-gray-900/95 backdrop-blur-sm border-b border-white/10',
+            navLink: 'text-white hover:text-indigo-400 transition-colors duration-200',
+            activeNavLink: 'text-indigo-400 font-semibold',
+            icon: 'text-white',
+            hoverBg: 'hover:bg-white/10 rounded-lg transition-all duration-200'
+          };
+        } else {
+          // Default dark page style
+          return {
+            header: 'bg-gradient-to-r from-gray-900/95 via-gray-800/95 to-gray-900/95 backdrop-blur-sm border-b border-white/10',
+            navLink: 'text-white hover:text-blue-400 transition-colors duration-200',
+            activeNavLink: 'text-blue-400 font-semibold',
+            icon: 'text-white',
+            hoverBg: 'hover:bg-white/10 rounded-lg transition-all duration-200'
+          };
+        }
       } else {
         return {
           header: 'bg-gradient-to-r from-white/80 via-blue-50/50 to-purple-50/50 backdrop-blur-sm border-b border-gray-200/50',
@@ -254,7 +329,15 @@ const Header = () => {
             className="flex items-center space-x-3 group"
           >
             <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-500 via-purple-500 to-cyan-500 rounded-lg blur-sm opacity-75 group-hover:opacity-100 transition-opacity duration-300"></div>
+              <div className={cn(
+                "absolute inset-0 rounded-lg blur-sm opacity-75 group-hover:opacity-100 transition-opacity duration-300",
+                isAdminPage ? "bg-gradient-to-r from-blue-500 via-purple-500 to-cyan-500" :
+                location.pathname === '/' ? "bg-gradient-to-r from-blue-500 via-purple-500 to-cyan-500" :
+                location.pathname === '/about' ? "bg-gradient-to-r from-purple-500 via-pink-500 to-purple-600" :
+                location.pathname === '/contact' ? "bg-gradient-to-r from-cyan-500 via-blue-500 to-cyan-600" :
+                location.pathname.startsWith('/products') ? "bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-600" :
+                "bg-gradient-to-r from-blue-500 via-purple-500 to-cyan-500"
+              )}></div>
               <Laptop className={cn(
                 "relative w-8 h-8 z-10",
                 isAdminPage ? "text-white" : 
@@ -262,9 +345,13 @@ const Header = () => {
               )} />
             </div>
             <span className={cn(
-              "text-xl font-bold tracking-tight bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent",
-              isAdminPage ? "from-blue-300 via-purple-300 to-cyan-300" : 
-              isDarkPage ? "from-blue-300 via-purple-300 to-cyan-300" : "from-blue-600 via-purple-600 to-cyan-600"
+              "text-xl font-bold tracking-tight bg-clip-text text-transparent",
+              isAdminPage ? "bg-gradient-to-r from-blue-300 via-purple-300 to-cyan-300" :
+              location.pathname === '/' ? "bg-gradient-to-r from-blue-300 via-purple-300 to-cyan-300" :
+              location.pathname === '/about' ? "bg-gradient-to-r from-purple-300 via-pink-300 to-purple-400" :
+              location.pathname === '/contact' ? "bg-gradient-to-r from-cyan-300 via-blue-300 to-cyan-400" :
+              location.pathname.startsWith('/products') ? "bg-gradient-to-r from-indigo-300 via-purple-300 to-indigo-400" :
+              isDarkPage ? "bg-gradient-to-r from-blue-300 via-purple-300 to-cyan-300" : "bg-gradient-to-r from-blue-600 via-purple-600 to-cyan-600"
             )}>
               {isAdminPage ? 'TechWave Admin' : 'TechWave'}
             </span>
