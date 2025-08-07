@@ -5,6 +5,11 @@ import react from '@vitejs/plugin-react';
 export default defineConfig({
   plugins: [react()],
   base: '/TechWave-Modern-Laptop-E-commerce-Platform/',
+  build: {
+    outDir: 'dist',
+    assetsDir: 'assets',
+    sourcemap: false,
+  },
   optimizeDeps: {
     exclude: ['lucide-react'],
   },
