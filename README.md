@@ -258,5 +258,10 @@ Your TechWave laptop store is now fully functional with:
 - ✅ Product catalog with filtering
 
 ![Screenshot](https://github.com/user-attachments/assets/dafa3299-cd8d-453b-9962-3ee419b4d64f)
+![Screenshot](https://github.com/user-attachments/assets/ab5199fd-84ab-455f-b7f9-ead668f6ef3a)
+![Screenshot](https://github.com/user-attachments/assets/a6d9f072-83ac-49e9-9906-cf58c0b47963)
+
+
+
 
 Enjoy your fully functional laptop e-commerce platform! 🚀 
